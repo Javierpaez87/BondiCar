@@ -88,41 +88,60 @@ export const useTripStore = create<TripState>((set, get) => ({
     }
   },
   
-  createTrip: async (tripData) => {
-    set({ isLoading: true, error: null });
-    try {
-      // Simulate API request
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Create new trip
-      const newTrip: Trip = {
-        id: `${mockTrips.length + 1}`,
-        driverId: currentUser.id,
-        driver: currentUser,
-        ...tripData,
-        status: 'active',
-        createdAt: new Date(),
-      };
-      
-      // Update trips state (in a real app, this would be saved to a database)
-      const updatedTrips = [...get().trips, newTrip];
-      const updatedMyTrips = [...get().myTrips, newTrip];
-      
-      set({ 
-        trips: updatedTrips,
-        myTrips: updatedMyTrips,
-        isLoading: false 
-      });
-      
-      return newTrip;
-    } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Error al crear viaje', 
-        isLoading: false 
-      });
-      throw error;
-    }
-  },
+  import { addDoc, collection, getFirestore, serverTimestamp } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+
+createTrip: async (tripData) => {
+  set({ isLoading: true, error: null });
+  try {
+    const db = getFirestore();
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) throw new Error('No estás autenticado');
+
+    const fullTrip = {
+      ...tripData,
+      driverId: user.uid,
+      status: 'active',
+      createdAt: serverTimestamp(),
+    };
+
+    const docRef = await addDoc(collection(db, 'Post Trips'), fullTrip);
+
+    const trip: Trip = {
+      id: docRef.id,
+      driverId: user.uid,
+      driver: {
+        id: user.uid,
+        name: user.displayName || '',
+        email: user.email || '',
+        photoUrl: user.photoURL || '',
+      },
+      ...tripData,
+      status: 'active',
+      createdAt: new Date(), // solo visual, no es igual a serverTimestamp
+    };
+
+    const updatedTrips = [...get().trips, trip];
+    const updatedMyTrips = [...get().myTrips, trip];
+
+    set({
+      trips: updatedTrips,
+      myTrips: updatedMyTrips,
+      isLoading: false,
+    });
+
+    return trip;
+  } catch (error) {
+    set({
+      error: error instanceof Error ? error.message : 'Error al crear viaje',
+      isLoading: false,
+    });
+    throw error;
+  }
+},
+
   
   filterTrips: (filters) => {
     const { trips } = get();
