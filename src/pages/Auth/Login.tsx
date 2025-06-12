@@ -125,20 +125,19 @@ const Login: React.FC = () => {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 mb-2">O ingresa con:</p>
-            <Button
-              type="button"
-              variant="outline"
-              fullWidth
-              onClick={handleGoogleLogin}
-              isLoading={isLoading}
-            >
-              <img
-                src="/google-icon.svg"
-                alt="Google"
-                className="h-5 w-5 mr-2"
-              />
-              Google
-            </Button>
+           <button
+  type="button"
+  onClick={handleGoogleLogin}
+  disabled={isLoading}
+  className="w-full inline-flex items-center justify-center gap-3 px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+>
+  <img
+    src="https://developers.google.com/identity/images/g-logo.png"
+    alt="Google logo"
+    className="h-5 w-5"
+  />
+  Iniciar sesión con Google
+</button>
           </div>
 
           <div className="mt-4 text-center">
