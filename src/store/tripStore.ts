@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { Trip, Booking, TripFilters } from '../types';
 import { mockTrips, mockBookings, currentUser } from '../utils/mockData';
+import { addDoc, collection, getFirestore, serverTimestamp } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 interface TripState {
   trips: Trip[];
@@ -87,9 +89,6 @@ export const useTripStore = create<TripState>((set, get) => ({
       });
     }
   },
-  
-  import { addDoc, collection, getFirestore, serverTimestamp } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
 
 createTrip: async (tripData) => {
   set({ isLoading: true, error: null });
