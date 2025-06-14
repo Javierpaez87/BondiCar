@@ -4,8 +4,6 @@ import {
   collection,
   addDoc,
   getDocs,
-  getDoc,
-  doc,
   query,
   where,
   Timestamp,
@@ -40,7 +38,6 @@ export const useTripStore = create<TripState>((set, get) => ({
       const db = getFirestore();
       const auth = getAuth();
       const user = auth.currentUser;
-
       if (!user) throw new Error('No estás autenticado');
 
       const fullTrip = {
@@ -156,38 +153,47 @@ export const useTripStore = create<TripState>((set, get) => ({
       const user = auth.currentUser;
       if (!user) throw new Error('No estás autenticado');
 
-      const snapshot = await getDocs(query(collection(db, 'Bookings'), where('passengerId', '==', user.uid)));
+      const q = query(collection(db, 'Bookings'), where('passengerId', '==', user.uid));
+      const snapshot = await getDocs(q);
 
-      const myBookings: Booking[] = await Promise.all(
-        snapshot.docs.map(async (docSnap) => {
-          const data = docSnap.data();
-          const tripRef = doc(db, 'Post Trips', data.tripId);
-          const tripSnap = await getDoc(tripRef);
-          const tripData = tripSnap.exists() ? tripSnap.data() : null;
+      const bookings: Booking[] = [];
 
-          return {
-            id: docSnap.id,
+      for (const doc of snapshot.docs) {
+        const data = doc.data() as DocumentData;
+
+        const tripSnap = await getDocs(query(
+          collection(db, 'Post Trips'),
+          where('__name__', '==', data.tripId)
+        ));
+
+        const tripDoc = tripSnap.docs[0];
+        const tripData = tripDoc?.data();
+
+        if (tripData) {
+          const booking: Booking = {
+            id: doc.id,
             ...data,
             createdAt: data.createdAt?.toDate?.() || new Date(),
             trip: {
-              id: data.tripId,
+              id: tripDoc.id,
               ...tripData,
-              departureDate: tripData?.departureDate?.toDate?.() || new Date(),
-              createdAt: tripData?.createdAt?.toDate?.() || new Date(),
+              departureDate: tripData.departureDate?.toDate?.() || new Date(),
+              createdAt: tripData.createdAt?.toDate?.() || new Date(),
               driver: {
-                ...tripData?.driver,
-                phone: tripData?.driver?.phone || '',
-                profilePicture: tripData?.driver?.profilePicture || '',
+                ...tripData.driver,
+                phone: tripData.driver?.phone || '',
+                profilePicture: tripData.driver?.profilePicture || '',
               },
             },
-          } as Booking;
-        })
-      );
+          };
+          bookings.push(booking);
+        }
+      }
 
-      set({ myBookings, isLoading: false });
+      set({ myBookings: bookings, isLoading: false });
     } catch (error) {
       set({
-        error: error instanceof Error ? error.message : 'Error al obtener mis reservas',
+        error: error instanceof Error ? error.message : 'Error al obtener reservas',
         isLoading: false,
       });
     }
