@@ -4,6 +4,8 @@ import {
   collection,
   addDoc,
   getDocs,
+  getDoc,
+  doc,
   query,
   where,
   Timestamp,
@@ -11,21 +13,24 @@ import {
   DocumentData,
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { Trip } from '../types';
+import { Trip, Booking } from '../types';
 
 interface TripState {
   trips: Trip[];
   myTrips: Trip[];
+  myBookings: Booking[];
   isLoading: boolean;
   error: string | null;
   createTrip: (tripData: any) => Promise<Trip>;
   fetchTrips: () => Promise<void>;
   fetchMyTrips: () => Promise<void>;
+  fetchMyBookings: () => Promise<void>;
 }
 
 export const useTripStore = create<TripState>((set, get) => ({
   trips: [],
   myTrips: [],
+  myBookings: [],
   isLoading: false,
   error: null,
 
@@ -138,6 +143,51 @@ export const useTripStore = create<TripState>((set, get) => ({
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Error al obtener mis viajes',
+        isLoading: false,
+      });
+    }
+  },
+
+  fetchMyBookings: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const db = getFirestore();
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) throw new Error('No estás autenticado');
+
+      const snapshot = await getDocs(query(collection(db, 'Bookings'), where('passengerId', '==', user.uid)));
+
+      const myBookings: Booking[] = await Promise.all(
+        snapshot.docs.map(async (docSnap) => {
+          const data = docSnap.data();
+          const tripRef = doc(db, 'Post Trips', data.tripId);
+          const tripSnap = await getDoc(tripRef);
+          const tripData = tripSnap.exists() ? tripSnap.data() : null;
+
+          return {
+            id: docSnap.id,
+            ...data,
+            createdAt: data.createdAt?.toDate?.() || new Date(),
+            trip: {
+              id: data.tripId,
+              ...tripData,
+              departureDate: tripData?.departureDate?.toDate?.() || new Date(),
+              createdAt: tripData?.createdAt?.toDate?.() || new Date(),
+              driver: {
+                ...tripData?.driver,
+                phone: tripData?.driver?.phone || '',
+                profilePicture: tripData?.driver?.profilePicture || '',
+              },
+            },
+          } as Booking;
+        })
+      );
+
+      set({ myBookings, isLoading: false });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Error al obtener mis reservas',
         isLoading: false,
       });
     }
