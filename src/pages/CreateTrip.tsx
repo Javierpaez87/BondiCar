@@ -20,6 +20,18 @@ interface CreateTripFormData {
   carColor?: string;
   description?: string;
 }
+interface CreateTripFormData {
+  origin: string;
+  destination: string;
+  departureDate: string;
+  departureTime: string;
+  availableSeats: number;
+  price: number;
+  carModel?: string;
+  carColor?: string;
+  description?: string;
+  phone: string; // ✅ nuevo campo agregado aquí
+}
 
 const CreateTrip: React.FC = () => {
   const navigate = useNavigate();
