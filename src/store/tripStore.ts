@@ -111,56 +111,36 @@ export const useTripStore = create<TripState>((set, get) => ({
   },
 
   fetchMyTrips: async () => {
-  set({ isLoading: true, error: null });
-  try {
-    const db = getFirestore();
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (!user) throw new Error('No estás autenticado');
+    set({ isLoading: true, error: null });
+    try {
+      const db = getFirestore();
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) throw new Error('No estás autenticado');
 
-    const q = query(collection(db, 'Post Trips'), where('driverId', '==', user.uid));
-    const snapshot = await getDocs(q);
+      const q = query(collection(db, 'Post Trips'), where('driverId', '==', user.uid));
+      const snapshot = await getDocs(q);
 
-    const myTrips: Trip[] = snapshot.docs.map((doc) => {
-      const data = doc.data() as DocumentData;
+      const myTrips: Trip[] = snapshot.docs.map((doc) => {
+        const data = doc.data() as DocumentData;
 
-      const driver = data.driver ?? {
-        id: user.uid,
-        name: user.displayName || '',
-        email: user.email || '',
-        phone: '',
-        profilePicture: '',
-        createdAt: new Date(),
-      };
+        const driver = data.driver ?? {
+          id: user.uid,
+          name: user.displayName || '',
+          email: user.email || '',
+          phone: '',
+          profilePicture: '',
+          createdAt: new Date(),
+        };
 
-      return {
-        id: doc.id,
-        ...data,
-        departureDate: data.departureDate?.toDate?.() || new Date(),
-        createdAt: data.createdAt?.toDate?.() || new Date(),
-        driver,
-      };
-    });
-
-set({ myTrips: myTrips, isLoading: false });
-  } catch (error) {
-    set({
-      error: error instanceof Error ? error.message : 'Error al obtener mis viajes',
-      isLoading: false,
-    });
-  }
-},
-
-
-    set({ myTrips, isLoading: false });
-  } catch (error) {
-    set({
-      error: error instanceof Error ? error.message : 'Error al obtener mis viajes',
-      isLoading: false,
-    });
-  }
-},
-
+        return {
+          id: doc.id,
+          ...data,
+          departureDate: data.departureDate?.toDate?.() || new Date(),
+          createdAt: data.createdAt?.toDate?.() || new Date(),
+          driver,
+        };
+      });
 
       set({ myTrips, isLoading: false });
     } catch (error) {
