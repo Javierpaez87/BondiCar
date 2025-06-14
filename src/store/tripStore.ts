@@ -1,8 +1,5 @@
 // 🔝 Esto debe estar al principio del archivo, con los demás imports
 import { Timestamp } from 'firebase/firestore';
-
-...
-
 // Dentro del objeto pasado a create<TripState>
 createTrip: async (tripData) => {
   set({ isLoading: true, error: null });
