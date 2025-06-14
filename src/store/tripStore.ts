@@ -55,24 +55,6 @@ const fullTrip = {
 },
 
 ...
-
-createTrip: async (tripData) => {
-  set({ isLoading: true, error: null });
-  try {
-    const db = getFirestore();
-    const auth = getAuth();
-    const user = auth.currentUser;
-
-    if (!user) throw new Error('No estás autenticado');
-
-    const fullTrip = {
-      ...tripData,
-      departureDate: Timestamp.fromDate(new Date(tripData.departureDate)), // ✅ conversión segura
-      driverId: user.uid,
-      status: 'active',
-      createdAt: serverTimestamp(),
-    };
-
     const docRef = await addDoc(collection(db, 'Post Trips'), fullTrip);
 
     const trip: Trip = {
