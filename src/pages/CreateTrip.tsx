@@ -19,6 +19,7 @@ interface CreateTripFormData {
   carModel?: string;
   carColor?: string;
   description?: string;
+  phone: string; 
 }
 interface CreateTripFormData {
   origin: string;
