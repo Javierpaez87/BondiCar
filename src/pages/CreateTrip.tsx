@@ -1,5 +1,5 @@
-interface CreateTripFormData {
   import { useNavigate } from 'react-router-dom';
+interface CreateTripFormData {
   origin: string;
   destination: string;
   departureDate: string;
