@@ -118,7 +118,7 @@ const TripCard: React.FC<TripCardProps> = ({
   <div className="flex space-x-3">
    {trip.driver.phone && (
   <a 
-    href={`https://wa.me/${trip.driver.phone.replace(/\D/g, '')}`}
+href={`https://wa.me/${trip.driver.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${trip.driver.name}, vi tu viaje de ${trip.origin} a ${trip.destination} en BondiCar y me interesa reservar un lugar.`)}`}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600 transition"
