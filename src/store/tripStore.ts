@@ -1,57 +1,75 @@
-// 🔝 Esto debe estar al principio del archivo, con los demás imports
-import { Timestamp } from 'firebase/firestore';
-// Dentro del objeto pasado a create<TripState>
-createTrip: async (tripData) => {
-  set({ isLoading: true, error: null });
+import { create } from 'zustand';
+import { getFirestore, collection, addDoc, Timestamp, serverTimestamp } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { Trip } from '../types';
 
-  try {
-    const db = getFirestore();
-    const auth = getAuth();
-    const user = auth.currentUser;
+interface TripState {
+  trips: Trip[];
+  myTrips: Trip[];
+  isLoading: boolean;
+  error: string | null;
+  createTrip: (tripData: any) => Promise<Trip>;
+  // Podés sumar acá otros métodos luego como fetchTrips, bookTrip, etc.
+}
 
-    if (!user) throw new Error('No estás autenticado');
+export const useTripStore = create<TripState>((set, get) => ({
+  trips: [],
+  myTrips: [],
+  isLoading: false,
+  error: null,
 
-    const fullTrip = {
-      ...tripData,
-      departureDate: Timestamp.fromDate(new Date(tripData.departureDate)), // ✅ conversión correcta
-      driverId: user.uid,
-      status: 'active',
-      createdAt: serverTimestamp(),
-    };
+  createTrip: async (tripData) => {
+    set({ isLoading: true, error: null });
 
-    const docRef = await addDoc(collection(db, 'Post Trips'), fullTrip);
+    try {
+      const db = getFirestore();
+      const auth = getAuth();
+      const user = auth.currentUser;
 
-    const trip: Trip = {
-      id: docRef.id,
-      driverId: user.uid,
-      driver: {
-        id: user.uid,
-        name: user.displayName || '',
-        email: user.email || '',
-        photoUrl: user.photoURL || '',
-      },
-      ...tripData,
-      departureDate: new Date(tripData.departureDate), // para la UI
-      status: 'active',
-      createdAt: new Date(), // solo visual
-    };
+      if (!user) throw new Error('No estás autenticado');
 
-    const updatedTrips = [...get().trips, trip];
-    const updatedMyTrips = [...get().myTrips, trip];
+      const fullTrip = {
+        ...tripData,
+        departureDate: Timestamp.fromDate(new Date(tripData.departureDate)),
+        driverId: user.uid,
+        status: 'active',
+        createdAt: serverTimestamp(),
+      };
 
-    set({
-      trips: updatedTrips,
-      myTrips: updatedMyTrips,
-      isLoading: false,
-    });
+      const docRef = await addDoc(collection(db, 'Post Trips'), fullTrip);
 
-    return trip;
-  } catch (error) {
-    set({
-      error: error instanceof Error ? error.message : 'Error al crear viaje',
-      isLoading: false,
-    });
-    throw error;
+      const trip: Trip = {
+        id: docRef.id,
+        driverId: user.uid,
+        driver: {
+          id: user.uid,
+          name: user.displayName || '',
+          email: user.email || '',
+          photoUrl: user.photoURL || '',
+        },
+        ...tripData,
+        departureDate: new Date(tripData.departureDate),
+        status: 'active',
+        createdAt: new Date(),
+      };
+
+      const updatedTrips = [...get().trips, trip];
+      const updatedMyTrips = [...get().myTrips, trip];
+
+      set({
+        trips: updatedTrips,
+        myTrips: updatedMyTrips,
+        isLoading: false,
+      });
+
+      return trip;
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Error al crear viaje',
+        isLoading: false,
+      });
+      throw error;
+    }
   }
-},
+}));
 
