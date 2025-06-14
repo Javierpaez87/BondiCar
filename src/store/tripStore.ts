@@ -142,7 +142,7 @@ export const useTripStore = create<TripState>((set, get) => ({
       };
     });
 
-    set({ myTrips, isLoading: false });
+set({ myTrips: myTrips, isLoading: false });
   } catch (error) {
     set({
       error: error instanceof Error ? error.message : 'Error al obtener mis viajes',
