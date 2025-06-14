@@ -1,4 +1,15 @@
-  import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { MapPin, Calendar, Clock, Users, DollarSign, Car, FileText } from 'lucide-react';
+
+import Layout from '../components/layout/Layout';
+import Input from '../components/ui/Input';
+import Button from '../components/ui/Button';
+
+import { useTripStore } from '../store/tripStore';
+import { useAuthStore } from '../store/authStore';
+
 interface CreateTripFormData {
   origin: string;
   destination: string;
@@ -30,14 +41,13 @@ const CreateTrip: React.FC = () => {
         ...data,
         availableSeats: Number(data.availableSeats),
         price: Number(data.price),
-        // 👇 Se deja como string ISO para que tripStore lo procese como Timestamp
         departureDate: data.departureDate,
       };
 
       await createTrip(tripData as any);
       navigate('/dashboard');
     } catch (error) {
-      // Error is handled in the store
+      // El error ya se maneja en el store
     }
   };
 
@@ -75,20 +85,21 @@ const CreateTrip: React.FC = () => {
                     {...register('destination', { required: 'El destino es requerido' })}
                   />
                 </div>
-<div className="grid grid-cols-1">
-  <Input
-    label="Teléfono de contacto (WhatsApp)"
-    placeholder="Ej: 5491123456789"
-    error={errors.phone?.message}
-    {...register('phone', {
-      required: 'El número de teléfono es requerido',
-      pattern: {
-        value: /^[0-9]{10,15}$/,
-        message: 'Número no válido',
-      },
-    })}
-  />
-</div>
+
+                <div className="grid grid-cols-1">
+                  <Input
+                    label="Teléfono de contacto (WhatsApp)"
+                    placeholder="Ej: 5491123456789"
+                    error={errors.phone?.message}
+                    {...register('phone', {
+                      required: 'El número de teléfono es requerido',
+                      pattern: {
+                        value: /^[0-9]{10,15}$/,
+                        message: 'Número no válido',
+                      },
+                    })}
+                  />
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
@@ -118,14 +129,8 @@ const CreateTrip: React.FC = () => {
                     error={errors.availableSeats?.message}
                     {...register('availableSeats', { 
                       required: 'El número de asientos es requerido',
-                      min: {
-                        value: 1,
-                        message: 'Debe haber al menos 1 asiento disponible'
-                      },
-                      max: {
-                        value: 10,
-                        message: 'Máximo 10 asientos disponibles'
-                      }
+                      min: { value: 1, message: 'Debe haber al menos 1 asiento disponible' },
+                      max: { value: 10, message: 'Máximo 10 asientos disponibles' }
                     })}
                   />
 
@@ -138,10 +143,7 @@ const CreateTrip: React.FC = () => {
                     error={errors.price?.message}
                     {...register('price', { 
                       required: 'El precio es requerido',
-                      min: {
-                        value: 0,
-                        message: 'El precio no puede ser negativo'
-                      }
+                      min: { value: 0, message: 'El precio no puede ser negativo' }
                     })}
                   />
                 </div>
@@ -179,19 +181,11 @@ const CreateTrip: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => navigate(-1)}
-                  >
+                  <Button type="button" variant="outline" onClick={() => navigate(-1)}>
                     Cancelar
                   </Button>
 
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    isLoading={isLoading}
-                  >
+                  <Button type="submit" variant="primary" isLoading={isLoading}>
                     Publicar Viaje
                   </Button>
                 </div>
