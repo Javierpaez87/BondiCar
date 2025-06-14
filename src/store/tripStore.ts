@@ -124,7 +124,6 @@ export const useTripStore = create<TripState>((set, get) => ({
     const myTrips: Trip[] = snapshot.docs.map((doc) => {
       const data = doc.data() as DocumentData;
 
-      // Verificación defensiva
       const driver = data.driver ?? {
         id: user.uid,
         name: user.displayName || '',
@@ -142,6 +141,16 @@ export const useTripStore = create<TripState>((set, get) => ({
         driver,
       };
     });
+
+    set({ myTrips, isLoading: false });
+  } catch (error) {
+    set({
+      error: error instanceof Error ? error.message : 'Error al obtener mis viajes',
+      isLoading: false,
+    });
+  }
+},
+
 
     set({ myTrips, isLoading: false });
   } catch (error) {
