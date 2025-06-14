@@ -96,6 +96,20 @@ const CreateTrip: React.FC = () => {
                     {...register('destination', { required: 'El destino es requerido' })}
                   />
                 </div>
+<div className="grid grid-cols-1">
+  <Input
+    label="Teléfono de contacto (WhatsApp)"
+    placeholder="Ej: 5491123456789"
+    error={errors.phone?.message}
+    {...register('phone', {
+      required: 'El número de teléfono es requerido',
+      pattern: {
+        value: /^[0-9]{10,15}$/,
+        message: 'Número no válido',
+      },
+    })}
+  />
+</div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
