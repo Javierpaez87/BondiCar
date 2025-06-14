@@ -9,14 +9,15 @@ createTrip: async (tripData) => {
 
     if (!user) throw new Error('No estás autenticado');
 
-    const fullTrip = {
-      ...tripData,
-      departureDate: Timestamp.fromDate(new Date(tripData.departureDate)), // <-- ESTA es la única línea nueva importante
-      driverId: user.uid,
-      status: 'active',
-      createdAt: serverTimestamp(),
-    };
+    import { Timestamp } from 'firebase/firestore'; // Asegurate de tener esta importación arriba
 
+const fullTrip = {
+  ...tripData,
+  departureDate: Timestamp.fromDate(new Date(tripData.departureDate)), // 👈 ESTE CAMBIO ES CLAVE
+  driverId: user.uid,
+  status: 'active',
+  createdAt: serverTimestamp(),
+};
     const docRef = await addDoc(collection(db, 'Post Trips'), fullTrip);
 
     const trip: Trip = {
