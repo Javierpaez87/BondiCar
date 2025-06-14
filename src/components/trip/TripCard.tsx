@@ -116,9 +116,9 @@ const TripCard: React.FC<TripCardProps> = ({
   </div>
 
   <div className="flex space-x-3">
-    {trip.phone && (
-      <a 
-        href={`https://wa.me/${trip.phone.replace(/\D/g, '')}`}
+   {trip.driver.phone && (
+  <a 
+    href={`https://wa.me/${trip.driver.phone.replace(/\D/g, '')}`}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600 transition"
