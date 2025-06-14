@@ -1,14 +1,3 @@
-// src/pages/CreateTrip.tsx
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { MapPin, Calendar, Clock, Users, DollarSign, Car, FileText } from 'lucide-react';
-import Layout from '../components/layout/Layout';
-import Input from '../components/ui/Input';
-import Button from '../components/ui/Button';
-import { useTripStore } from '../store/tripStore';
-import { useAuthStore } from '../store/authStore';
-
 interface CreateTripFormData {
   origin: string;
   destination: string;
