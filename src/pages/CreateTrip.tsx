@@ -8,19 +8,7 @@ interface CreateTripFormData {
   carModel?: string;
   carColor?: string;
   description?: string;
-  phone: string; 
-}
-interface CreateTripFormData {
-  origin: string;
-  destination: string;
-  departureDate: string;
-  departureTime: string;
-  availableSeats: number;
-  price: number;
-  carModel?: string;
-  carColor?: string;
-  description?: string;
-  phone: string; // ✅ nuevo campo agregado aquí
+  phone: string;
 }
 
 const CreateTrip: React.FC = () => {
