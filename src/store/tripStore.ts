@@ -44,26 +44,23 @@ export const useTripStore = create<TripState>((set, get) => ({
         driverId: user.uid,
         status: 'active',
         createdAt: serverTimestamp(),
+        driver: {
+          id: user.uid,
+          name: user.displayName || '',
+          email: user.email || '',
+          phone: tripData.phone || '',
+          profilePicture: user.photoURL || '',
+        },
       };
 
       const docRef = await addDoc(collection(db, 'Post Trips'), fullTrip);
 
-const trip: Trip = {
-  id: docRef.id,
-  driverId: user.uid,
-  driver: {
-    id: user.uid,
-    name: user.displayName || '',
-    email: user.email || '',
-    photoUrl: user.photoURL || '',
-  },
-  phone: tripData.phone, // ✅ agregamos el número aquí
-  ...tripData,
-  departureDate: new Date(tripData.departureDate),
-  status: 'active',
-  createdAt: new Date(),
-};
-
+      const trip: Trip = {
+        id: docRef.id,
+        ...fullTrip,
+        departureDate: new Date(tripData.departureDate),
+        createdAt: new Date(),
+      };
 
       set((state) => ({
         trips: [...state.trips, trip],
@@ -93,6 +90,12 @@ const trip: Trip = {
           id: doc.id,
           ...data,
           departureDate: data.departureDate?.toDate?.() || new Date(),
+          createdAt: data.createdAt?.toDate?.() || new Date(),
+          driver: {
+            ...data.driver,
+            phone: data.driver?.phone || '',
+            profilePicture: data.driver?.profilePicture || '',
+          },
         };
       });
 
@@ -122,6 +125,12 @@ const trip: Trip = {
           id: doc.id,
           ...data,
           departureDate: data.departureDate?.toDate?.() || new Date(),
+          createdAt: data.createdAt?.toDate?.() || new Date(),
+          driver: {
+            ...data.driver,
+            phone: data.driver?.phone || '',
+            profilePicture: data.driver?.profilePicture || '',
+          },
         };
       });
 
