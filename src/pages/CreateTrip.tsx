@@ -1,3 +1,4 @@
+// src/pages/CreateTrip.tsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -26,7 +27,6 @@ const CreateTrip: React.FC = () => {
   const { createTrip, isLoading, error } = useTripStore();
   const { register, handleSubmit, formState: { errors } } = useForm<CreateTripFormData>();
   
-  // Redirect to login if not authenticated
   React.useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
@@ -39,16 +39,17 @@ const CreateTrip: React.FC = () => {
         ...data,
         availableSeats: Number(data.availableSeats),
         price: Number(data.price),
-        departureDate: new Date(data.departureDate),
+        // 👇 Se deja como string ISO para que tripStore lo procese como Timestamp
+        departureDate: data.departureDate,
       };
-      
-      await createTrip(tripData);
+
+      await createTrip(tripData as any);
       navigate('/dashboard');
     } catch (error) {
       // Error is handled in the store
     }
   };
-  
+
   return (
     <Layout>
       <div className="bg-gray-50 py-8">
@@ -57,13 +58,13 @@ const CreateTrip: React.FC = () => {
             <h1 className="text-2xl font-bold text-gray-900 mb-6">
               Publicar un Viaje
             </h1>
-            
+
             {error && (
               <div className="p-4 mb-6 bg-red-50 text-red-700 rounded-lg">
                 {error}
               </div>
             )}
-            
+
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -74,7 +75,7 @@ const CreateTrip: React.FC = () => {
                     error={errors.origin?.message}
                     {...register('origin', { required: 'El origen es requerido' })}
                   />
-                  
+
                   <Input
                     label="Destino"
                     placeholder="Ciudad de destino"
@@ -83,7 +84,7 @@ const CreateTrip: React.FC = () => {
                     {...register('destination', { required: 'El destino es requerido' })}
                   />
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
                     label="Fecha de salida"
@@ -92,7 +93,7 @@ const CreateTrip: React.FC = () => {
                     error={errors.departureDate?.message}
                     {...register('departureDate', { required: 'La fecha es requerida' })}
                   />
-                  
+
                   <Input
                     label="Hora de salida"
                     type="time"
@@ -101,7 +102,7 @@ const CreateTrip: React.FC = () => {
                     {...register('departureTime', { required: 'La hora es requerida' })}
                   />
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
                     label="Asientos disponibles"
@@ -122,7 +123,7 @@ const CreateTrip: React.FC = () => {
                       }
                     })}
                   />
-                  
+
                   <Input
                     label="Precio por asiento"
                     type="number"
@@ -139,7 +140,7 @@ const CreateTrip: React.FC = () => {
                     })}
                   />
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
                     label="Modelo del vehículo"
@@ -147,14 +148,14 @@ const CreateTrip: React.FC = () => {
                     leftIcon={<Car className="h-5 w-5 text-gray-400" />}
                     {...register('carModel')}
                   />
-                  
+
                   <Input
                     label="Color del vehículo"
                     placeholder="Ej: Blanco"
                     {...register('carColor')}
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Descripción (opcional)
@@ -171,7 +172,7 @@ const CreateTrip: React.FC = () => {
                     ></textarea>
                   </div>
                 </div>
-                
+
                 <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4">
                   <Button
                     type="button"
@@ -180,7 +181,7 @@ const CreateTrip: React.FC = () => {
                   >
                     Cancelar
                   </Button>
-                  
+
                   <Button
                     type="submit"
                     variant="primary"
