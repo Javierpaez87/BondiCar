@@ -71,6 +71,7 @@ const CreateTrip: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
                     label="Origen"
+                    list="lugares"
                     placeholder="Ciudad de origen"
                     leftIcon={<MapPin className="h-5 w-5 text-gray-400" />}
                     error={errors.origin?.message}
@@ -79,6 +80,7 @@ const CreateTrip: React.FC = () => {
 
                   <Input
                     label="Destino"
+                    list="lugares"
                     placeholder="Ciudad de destino"
                     leftIcon={<MapPin className="h-5 w-5 text-gray-400" />}
                     error={errors.destination?.message}
@@ -191,6 +193,20 @@ const CreateTrip: React.FC = () => {
                 </div>
               </div>
             </form>
+
+            {/* Lista de lugares sugeridos para estandarizar */}
+            <datalist id="lugares">
+              <option value="Junín de los Andes" />
+              <option value="San Martín de los Andes" />
+              <option value="Bariloche" />
+              <option value="Villa La Angostura" />
+              <option value="Zapala" />
+              <option value="Neuquén" />
+              <option value="Esquel" />
+              <option value="El Bolsón" />
+              <option value="Trevelin" />
+              <option value="La Pampa" />
+            </datalist>
           </div>
         </div>
       </div>
