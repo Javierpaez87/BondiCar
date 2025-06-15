@@ -46,36 +46,51 @@ const Home: React.FC = () => {
               </p>
               
               <form onSubmit={handleSearch} className="bg-stone-100 rounded-xl p-6 shadow-2xl animate-slide-up border-2 border-amber-600" style={{ animationDelay: '0.2s' }}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <Input
-                    placeholder="¿Desde dónde salís?"
-                    value={origin}
-                    onChange={(e) => setOrigin(e.target.value)}
-                    leftIcon={<MapPin className="h-5 w-5 text-amber-600" />}
-                    required
-                    className="border-stone-300 focus:border-amber-600 focus:ring-amber-600"
-                  />
-                  
-                  <Input
-                    placeholder="¿A dónde vas?"
-                    value={destination}
-                    onChange={(e) => setDestination(e.target.value)}
-                    leftIcon={<MapPin className="h-5 w-5 text-amber-600" />}
-                    required
-                    className="border-stone-300 focus:border-amber-600 focus:ring-amber-600"
-                  />
-                </div>
-                
-                <Button 
-                  type="submit" 
-                  variant="primary" 
-                  fullWidth 
-                  icon={<Search className="h-5 w-5" />}
-                  className="bg-amber-600 hover:bg-amber-700 text-stone-900 font-bold border border-amber-500"
-                >
-                  Buscar Viajes
-                </Button>
-              </form>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <Input
+      list="lugares"
+      placeholder="¿Desde dónde salís?"
+      value={origin}
+      onChange={(e) => setOrigin(e.target.value)}
+      leftIcon={<MapPin className="h-5 w-5 text-amber-600" />}
+      required
+      className="border-stone-300 focus:border-amber-600 focus:ring-amber-600"
+    />
+    
+    <Input
+      list="lugares"
+      placeholder="¿A dónde vas?"
+      value={destination}
+      onChange={(e) => setDestination(e.target.value)}
+      leftIcon={<MapPin className="h-5 w-5 text-amber-600" />}
+      required
+      className="border-stone-300 focus:border-amber-600 focus:ring-amber-600"
+    />
+  </div>
+
+  <Button 
+    type="submit" 
+    variant="primary" 
+    fullWidth 
+    icon={<Search className="h-5 w-5" />}
+    className="bg-amber-600 hover:bg-amber-700 text-stone-900 font-bold border border-amber-500"
+  >
+    Buscar Viajes
+  </Button>
+</form>
+
+<datalist id="lugares">
+  <option value="Junín de los Andes" />
+  <option value="San Martín de los Andes" />
+  <option value="Bariloche" />
+  <option value="Villa La Angostura" />
+  <option value="Zapala" />
+  <option value="Neuquén" />
+  <option value="Esquel" />
+  <option value="El Bolsón" />
+  <option value="Trevelin" />
+  <option value="La Pampa" />
+</datalist>
             </div>
             
             <div className="md:w-1/2 flex justify-center">
