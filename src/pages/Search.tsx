@@ -48,14 +48,14 @@ const Search: React.FC = () => {
   // 🔧 Solo se pasa tripId porque así lo espera bookTrip
   const handleConfirmBooking = async (tripId: string, seats: number) => {
     try {
-      await bookTrip(tripId);
-      alert('Reserva enviada al conductor');
-      setSelectedTrip(null);
-    } catch (error) {
-      console.error('Error al reservar:', error);
-      alert('Ocurrió un error al reservar');
-    }
-  };
+    await bookTrip(tripId, seats); // ✅ Agregamos seats
+    alert('Reserva enviada al conductor');
+    setSelectedTrip(null);
+  } catch (error) {
+    console.error('Error al reservar:', error);
+    alert('Ocurrió un error al reservar');
+  }
+};
 
   return (
     <Layout>
