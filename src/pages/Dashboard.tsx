@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { Car, Bookmark, User } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 import TripCard from '../components/trip/TripCard';
+import PendingBookings from '../components/PendingBookings'; // ✅ nuevo
 import { useTripStore } from '../store/tripStore';
 import { useAuthStore } from '../store/authStore';
 import { Booking } from '../types';
@@ -10,31 +11,29 @@ import { Booking } from '../types';
 const Dashboard: React.FC = () => {
   const { isAuthenticated, user } = useAuthStore();
   const { myTrips, myBookings, isLoading, error, fetchMyTrips, fetchMyBookings } = useTripStore();
-  const [activeTab, setActiveTab] = useState<'trips' | 'bookings' | 'profile'>('trips');
-  
+  const [activeTab, setActiveTab] = useState<'trips' | 'bookings' | 'received' | 'profile'>('trips');
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchMyTrips();
       fetchMyBookings();
     }
   }, [isAuthenticated, fetchMyTrips, fetchMyBookings]);
-  
+
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
-  
+
   const getReservationStatus = (booking: Booking) => {
     return booking.status;
   };
-  
+
   return (
     <Layout>
       <div className="bg-gray-50 py-8 min-h-screen">
         <div className="container mx-auto px-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
-            Mi Panel
-          </h1>
-          
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Mi Panel</h1>
+
           <div className="mb-8">
             <div className="border-b border-gray-200">
               <nav className="flex space-x-8">
@@ -49,7 +48,7 @@ const Dashboard: React.FC = () => {
                   <Car className="inline-block h-5 w-5 mr-2" />
                   Mis Viajes Publicados
                 </button>
-                
+
                 <button
                   onClick={() => setActiveTab('bookings')}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
@@ -61,7 +60,19 @@ const Dashboard: React.FC = () => {
                   <Bookmark className="inline-block h-5 w-5 mr-2" />
                   Mis Reservas
                 </button>
-                
+
+                <button
+                  onClick={() => setActiveTab('received')}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                    activeTab === 'received'
+                      ? 'border-primary-500 text-primary-500'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Bookmark className="inline-block h-5 w-5 mr-2" />
+                  Reservas Recibidas
+                </button>
+
                 <button
                   onClick={() => setActiveTab('profile')}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
@@ -76,13 +87,11 @@ const Dashboard: React.FC = () => {
               </nav>
             </div>
           </div>
-          
+
           {error && (
-            <div className="p-4 bg-red-50 text-red-700 rounded-lg mb-6">
-              {error}
-            </div>
+            <div className="p-4 bg-red-50 text-red-700 rounded-lg mb-6">{error}</div>
           )}
-          
+
           {isLoading ? (
             <div className="flex justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
@@ -94,7 +103,6 @@ const Dashboard: React.FC = () => {
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">
                     Viajes que has publicado
                   </h2>
-                  
                   {myTrips.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {myTrips.map((trip) => (
@@ -120,19 +128,18 @@ const Dashboard: React.FC = () => {
                   )}
                 </div>
               )}
-              
+
               {activeTab === 'bookings' && (
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">
                     Viajes que has reservado
                   </h2>
-                  
                   {myBookings.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {myBookings.map((booking) => (
-                        <TripCard 
-                          key={booking.id} 
-                          trip={booking.trip} 
+                        <TripCard
+                          key={booking.id}
+                          trip={booking.trip}
                           isReserved={true}
                           reservationStatus={getReservationStatus(booking)}
                         />
@@ -157,16 +164,25 @@ const Dashboard: React.FC = () => {
                   )}
                 </div>
               )}
-              
+
+              {activeTab === 'received' && (
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                    Reservas que recibiste como conductor
+                  </h2>
+                  <PendingBookings />
+                </div>
+              )}
+
               {activeTab === 'profile' && (
                 <div className="bg-white rounded-lg shadow-card p-6">
                   <div className="flex flex-col md:flex-row">
                     <div className="md:w-1/3 flex justify-center mb-6 md:mb-0">
                       <div className="h-32 w-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
                         {user?.profilePicture ? (
-                          <img 
-                            src={user.profilePicture} 
-                            alt={user.name} 
+                          <img
+                            src={user.profilePicture}
+                            alt={user.name}
                             className="h-full w-full object-cover"
                           />
                         ) : (
@@ -174,28 +190,28 @@ const Dashboard: React.FC = () => {
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="md:w-2/3">
                       <h2 className="text-xl font-semibold text-gray-900 mb-4">
                         Información Personal
                       </h2>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <h3 className="text-sm font-medium text-gray-500">Nombre</h3>
                           <p className="text-base text-gray-900">{user?.name}</p>
                         </div>
-                        
+
                         <div>
                           <h3 className="text-sm font-medium text-gray-500">Correo electrónico</h3>
                           <p className="text-base text-gray-900">{user?.email}</p>
                         </div>
-                        
+
                         <div>
                           <h3 className="text-sm font-medium text-gray-500">Teléfono</h3>
                           <p className="text-base text-gray-900">{user?.phone}</p>
                         </div>
-                        
+
                         <div>
                           <h3 className="text-sm font-medium text-gray-500">Miembro desde</h3>
                           <p className="text-base text-gray-900">
@@ -203,7 +219,7 @@ const Dashboard: React.FC = () => {
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="mt-6">
                         <a
                           href="#"
