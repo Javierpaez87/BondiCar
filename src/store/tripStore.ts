@@ -11,24 +11,27 @@ import {
   DocumentData,
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { Trip, Booking } from '../types';
+import { Trip, Booking, TripFilters } from '../types';
 
 interface TripState {
   trips: Trip[];
   myTrips: Trip[];
   myBookings: Booking[];
+  filteredTrips: Trip[];
   isLoading: boolean;
   error: string | null;
   createTrip: (tripData: any) => Promise<Trip>;
   fetchTrips: () => Promise<void>;
   fetchMyTrips: () => Promise<void>;
   fetchMyBookings: () => Promise<void>;
+  filterTrips: (filters: TripFilters) => void;
 }
 
 export const useTripStore = create<TripState>((set, get) => ({
   trips: [],
   myTrips: [],
   myBookings: [],
+  filteredTrips: [],
   isLoading: false,
   error: null,
 
@@ -67,6 +70,7 @@ export const useTripStore = create<TripState>((set, get) => ({
       set((state) => ({
         trips: [...state.trips, trip],
         myTrips: [...state.myTrips, trip],
+        filteredTrips: [...state.filteredTrips, trip],
         isLoading: false,
       }));
 
@@ -101,7 +105,7 @@ export const useTripStore = create<TripState>((set, get) => ({
         };
       });
 
-      set({ trips, isLoading: false });
+      set({ trips, filteredTrips: trips, isLoading: false });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Error al obtener viajes',
@@ -203,5 +207,19 @@ export const useTripStore = create<TripState>((set, get) => ({
         isLoading: false,
       });
     }
+  },
+
+  filterTrips: (filters: TripFilters) => {
+    const allTrips = get().trips;
+    const filtered = allTrips.filter((trip) => {
+      const matchesOrigin = filters.origin
+        ? trip.origin.toLowerCase().includes(filters.origin.toLowerCase())
+        : true;
+      const matchesDestination = filters.destination
+        ? trip.destination.toLowerCase().includes(filters.destination.toLowerCase())
+        : true;
+      return matchesOrigin && matchesDestination;
+    });
+    set({ filteredTrips: filtered });
   },
 }));
