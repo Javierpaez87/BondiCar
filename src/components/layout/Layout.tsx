@@ -10,6 +10,7 @@ import {
   getDocs,
 } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { X } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -19,6 +20,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user, isAuthenticated } = useAuthStore();
   const [hasPendingBookings, setHasPendingBookings] = useState(false);
   const [reservationStatus, setReservationStatus] = useState<'accepted' | 'rejected' | null>(null);
+  const [hidePendingNotice, setHidePendingNotice] = useState(false);
+  const [hideStatusNotice, setHideStatusNotice] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +31,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       if (!isAuthenticated || !user) return;
 
       try {
-        // 🔔 Conductor: buscar reservas pendientes
+        // Conductor: check for pending bookings
         const tripsSnapshot = await getDocs(
           query(collection(db, 'Post Trips'), where('driverId', '==', user.uid))
         );
@@ -49,7 +52,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           }
         }
 
-        // ✅ Pasajero: verificar estado de reservas
+        // Pasajero: check for accepted or rejected bookings
         const passengerSnapshot = await getDocs(
           query(
             collection(db, 'Bookings'),
@@ -73,10 +76,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     fetchNotifications();
   }, [isAuthenticated, user]);
 
-  // ⏱ Ocultar notificación pasajero después de unos segundos
+  // Ocultar automáticamente notificación de pasajero tras 8s
   useEffect(() => {
     if (reservationStatus) {
-      const timeout = setTimeout(() => setReservationStatus(null), 8000);
+      const timeout = setTimeout(() => setHideStatusNotice(true), 8000);
       return () => clearTimeout(timeout);
     }
   }, [reservationStatus]);
@@ -85,10 +88,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="flex flex-col min-h-screen">
       <Header />
 
-      {/* 🔔 Notificación para conductor */}
-      {hasPendingBookings && (
-        <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 flex justify-between items-center">
-          <div>
+      {/* 🔔 Notificación conductor */}
+      {hasPendingBookings && !hidePendingNotice && (
+        <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 flex justify-between items-center relative">
+          <div className="flex-1">
             🔔 Tienes nuevas reservas pendientes para tus viajes publicados.
           </div>
           <button
@@ -100,30 +103,40 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           >
             Ver reservas
           </button>
+          <button
+            onClick={() => setHidePendingNotice(true)}
+            className="absolute top-2 right-2 text-yellow-700 hover:text-yellow-900"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
       )}
 
-      {/* ✅ Notificación para pasajero */}
-      {reservationStatus === 'accepted' && (
-        <div className="bg-green-100 border border-green-400 text-green-800 px-4 py-3 text-center">
-          ✅ Tu reserva fue aceptada.{' '}
+      {/* ✅ Notificación pasajero */}
+      {reservationStatus && !hideStatusNotice && (
+        <div
+          className={`px-4 py-3 text-center border flex items-center justify-center gap-2 relative ${
+            reservationStatus === 'accepted'
+              ? 'bg-green-100 border-green-400 text-green-800'
+              : 'bg-red-100 border-red-400 text-red-800'
+          }`}
+        >
+          {reservationStatus === 'accepted'
+            ? '✅ Tu reserva fue aceptada.'
+            : '❌ Tu reserva fue rechazada.'}
+
           <button
             onClick={() => navigate('/dashboard')}
             className="underline font-semibold"
           >
             Ver detalles
           </button>
-        </div>
-      )}
 
-      {reservationStatus === 'rejected' && (
-        <div className="bg-red-100 border border-red-400 text-red-800 px-4 py-3 text-center">
-          ❌ Tu reserva fue rechazada.{' '}
           <button
-            onClick={() => navigate('/dashboard')}
-            className="underline font-semibold"
+            onClick={() => setHideStatusNotice(true)}
+            className="absolute top-2 right-2 text-sm"
           >
-            Ver detalles
+            <X className="h-4 w-4" />
           </button>
         </div>
       )}
