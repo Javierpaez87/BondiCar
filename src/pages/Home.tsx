@@ -32,17 +32,17 @@ const Home: React.FC = () => {
             <div className="md:w-1/2 mb-8 md:mb-0">
               <div className="flex items-center mb-4">
                 <Mountain className="h-8 w-8 text-amber-400 mr-3" />
-                <span className="text-amber-400 font-semibold text-lg">Desde la Patagonia</span>
+                <span className="text-amber-400 font-semibold text-lg">Patagonia</span>
               </div>
               
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4 animate-slide-up text-shadow-lg">
-                Compartí tu aventura en 
+                Juntos y al mismo lugar 
                 <span className="text-amber-400"> BondiCar</span>
               </h1>
               
               <p className="text-lg md:text-xl opacity-90 mb-8 max-w-xl animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                Conectamos viajeros que recorren los mismos caminos patagónicos. 
-                Ahorrá en combustible y conocé gente increíble en el camino.
+                Conectamos viajeros, ahorramos combustible, y hacemos amigos.
+      
               </p>
               
               <form onSubmit={handleSearch} className="bg-stone-100 rounded-xl p-6 shadow-2xl animate-slide-up border-2 border-amber-600" style={{ animationDelay: '0.2s' }}>
@@ -200,7 +200,7 @@ const Home: React.FC = () => {
         <div className="container mx-auto px-4 text-center">
           <Mountain className="h-16 w-16 mx-auto mb-6 text-stone-800" />
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            ¿Listo para tu próxima aventura?
+            ¿Vamos? Te llevo!
           </h2>
           <p className="text-lg opacity-90 mb-8 max-w-2xl mx-auto">
             Únete a nuestra comunidad de viajeros patagónicos. Ahorrá dinero, 
