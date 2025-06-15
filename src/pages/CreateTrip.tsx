@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { MapPin, Calendar, Clock, Users, DollarSign, Car, FileText } from 'lucide-react';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 import Layout from '../components/layout/Layout';
 import Input from '../components/ui/Input';
@@ -27,14 +29,56 @@ const CreateTrip: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
   const { createTrip, isLoading, error } = useTripStore();
-  const { register, handleSubmit, formState: { errors } } = useForm<CreateTripFormData>();
-  
-  React.useEffect(() => {
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<CreateTripFormData>();
+  const [userPhone, setUserPhone] = useState('');
+
+  // Redirigir si no está autenticado
+  useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
     }
   }, [isAuthenticated, navigate]);
-  
+
+  // Traer teléfono si existe en el perfil
+  useEffect(() => {
+    const fetchPhone = async () => {
+      const db = getFirestore();
+      const auth = getAuth();
+      const uid = auth.currentUser?.uid;
+      if (!uid) return;
+
+      const userRef = doc(db, 'users', uid);
+      const snapshot = await getDoc(userRef);
+      const data = snapshot.data();
+      if (data?.phone) {
+        setUserPhone(data.phone);
+        setValue('phone', data.phone); // setea en el formulario
+      }
+    };
+
+    fetchPhone();
+  }, [setValue]);
+
+  // Guardar teléfono si no estaba ya en el perfil
+  const guardarTelefonoUsuario = async (telefono: string) => {
+    const db = getFirestore();
+    const auth = getAuth();
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+
+    const userRef = doc(db, 'users', uid);
+    const snapshot = await getDoc(userRef);
+
+    if (!snapshot.exists()) {
+      await setDoc(userRef, { phone: telefono });
+    } else {
+      const data = snapshot.data();
+      if (!data.phone) {
+        await setDoc(userRef, { ...data, phone: telefono });
+      }
+    }
+  };
+
   const onSubmit = async (data: CreateTripFormData) => {
     try {
       const tripData = {
@@ -44,6 +88,7 @@ const CreateTrip: React.FC = () => {
         departureDate: data.departureDate,
       };
 
+      await guardarTelefonoUsuario(data.phone);
       await createTrip(tripData as any);
       navigate('/dashboard');
     } catch (error) {
@@ -88,7 +133,7 @@ const CreateTrip: React.FC = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-1">
+                <div>
                   <Input
                     label="Teléfono de contacto (WhatsApp)"
                     placeholder="Ej: 5491123456789"
@@ -96,11 +141,14 @@ const CreateTrip: React.FC = () => {
                     {...register('phone', {
                       required: 'El número de teléfono es requerido',
                       pattern: {
-                        value: /^[0-9]{10,15}$/,
-                        message: 'Número no válido',
+                        value: /^549\d{10}$/,
+                        message: 'Debe comenzar con 549 y tener 13 dígitos',
                       },
                     })}
                   />
+                  <div className="text-sm mt-1 text-amber-600 flex items-center">
+                    ⚠️ Asegurate de ingresar el número completo, incluyendo el código de país (ej: 549...). Es el que se usará para abrir WhatsApp.
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -194,7 +242,6 @@ const CreateTrip: React.FC = () => {
               </div>
             </form>
 
-            {/* Lista de lugares sugeridos para estandarizar */}
             <datalist id="lugares">
               <option value="Junín de los Andes" />
               <option value="San Martín de los Andes" />
