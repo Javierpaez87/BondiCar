@@ -25,7 +25,7 @@ interface TripState {
   fetchMyTrips: () => Promise<void>;
   fetchMyBookings: () => Promise<void>;
   filterTrips: (filters: TripFilters) => void;
-  bookTrip: (tripId: string) => Promise<void>; // ✅ SOLO FIRMA AQUÍ
+  bookTrip: (tripId: string) => Promise<void>; // ✅ Solo la firma aquí
 }
 
 export const useTripStore = create<TripState>((set, get) => ({
