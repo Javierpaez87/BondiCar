@@ -11,7 +11,16 @@ import { useAuthStore } from '../store/authStore';
 const Search: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { isAuthenticated } = useAuthStore();
-  const { trips, filteredTrips, isLoading, error, fetchTrips, filterTrips, bookTrip } = useTripStore();
+  const {
+    trips,
+    filteredTrips,
+    isLoading,
+    error,
+    fetchTrips,
+    filterTrips,
+    bookTrip,
+  } = useTripStore();
+
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
 
   useEffect(() => {
@@ -45,17 +54,16 @@ const Search: React.FC = () => {
     setSelectedTrip(trip);
   };
 
-  // 🔧 Solo se pasa tripId porque así lo espera bookTrip
   const handleConfirmBooking = async (tripId: string, seats: number) => {
     try {
-    await bookTrip(tripId, seats); // ✅ Agregamos seats
-    alert('Reserva enviada al conductor');
-    setSelectedTrip(null);
-  } catch (error) {
-    console.error('Error al reservar:', error);
-    alert('Ocurrió un error al reservar');
-  }
-};
+      await bookTrip(tripId, seats); // ✅ seats correctamente enviado
+      alert('Reserva enviada al conductor');
+      setSelectedTrip(null);
+    } catch (error) {
+      console.error('Error al reservar:', error);
+      alert('Ocurrió un error al reservar');
+    }
+  };
 
   return (
     <Layout>
@@ -69,7 +77,9 @@ const Search: React.FC = () => {
 
           <div className="mb-4">
             <h2 className="text-xl font-semibold text-gray-900">
-              {isLoading ? 'Cargando viajes...' : `${filteredTrips.length} viajes encontrados`}
+              {isLoading
+                ? 'Cargando viajes...'
+                : `${filteredTrips.length} viajes encontrados`}
             </h2>
           </div>
 
@@ -95,7 +105,9 @@ const Search: React.FC = () => {
                 ))
               ) : (
                 <div className="col-span-3 text-center py-12">
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron viajes</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    No se encontraron viajes
+                  </h3>
                   <p className="text-gray-600">
                     Intenta con otros filtros o crea un nuevo viaje.
                   </p>
