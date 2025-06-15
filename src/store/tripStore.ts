@@ -25,7 +25,7 @@ interface TripState {
   fetchMyTrips: () => Promise<void>;
   fetchMyBookings: () => Promise<void>;
   filterTrips: (filters: TripFilters) => void;
-  bookTrip: (tripId: string) => Promise<void>; // ✅ Solo la firma aquí
+  bookTrip: (tripId: string, seats: number) => Promise<void>; // ✅ ahora incluye seats
 }
 
 export const useTripStore = create<TripState>((set, get) => ({
@@ -224,7 +224,8 @@ export const useTripStore = create<TripState>((set, get) => ({
     set({ filteredTrips: filtered });
   },
 
-  bookTrip: async (tripId: string) => {
+  // ✅ bookTrip ahora guarda seats
+  bookTrip: async (tripId: string, seats: number) => {
     set({ isLoading: true, error: null });
     try {
       const db = getFirestore();
@@ -235,6 +236,7 @@ export const useTripStore = create<TripState>((set, get) => ({
       const bookingData = {
         tripId,
         passengerId: user.uid,
+        seats, // 🟢 nuevo campo
         status: 'pending',
         createdAt: serverTimestamp(),
       };
