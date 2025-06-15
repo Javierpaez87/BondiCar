@@ -25,6 +25,7 @@ interface TripState {
   fetchMyTrips: () => Promise<void>;
   fetchMyBookings: () => Promise<void>;
   filterTrips: (filters: TripFilters) => void;
+  bookTrip: (tripId: string) => Promise<void>; // ✅ SOLO FIRMA AQUÍ
 }
 
 export const useTripStore = create<TripState>((set, get) => ({
@@ -221,5 +222,32 @@ export const useTripStore = create<TripState>((set, get) => ({
       return matchesOrigin && matchesDestination;
     });
     set({ filteredTrips: filtered });
+  },
+
+  bookTrip: async (tripId: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const db = getFirestore();
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) throw new Error('No estás autenticado');
+
+      const bookingData = {
+        tripId,
+        passengerId: user.uid,
+        status: 'pending',
+        createdAt: serverTimestamp(),
+      };
+
+      await addDoc(collection(db, 'Bookings'), bookingData);
+
+      set({ isLoading: false });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Error al reservar viaje',
+        isLoading: false,
+      });
+      throw error;
+    }
   },
 }));
