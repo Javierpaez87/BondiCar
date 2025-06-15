@@ -26,20 +26,21 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             </div>
           )}
           
-          <input
-            ref={ref}
-            className={clsx(
-              'block rounded-lg border-gray-300 shadow-sm transition-colors focus:border-primary-500 focus:ring-primary-500',
-              leftIcon ? 'pl-10' : 'pl-4',
-              rightIcon ? 'pr-10' : 'pr-4',
-              error ? 'border-error-500' : 'border-gray-300',
-              fullWidth ? 'w-full' : '',
-              'py-2',
-              className
-            )}
-            {...props}
-          />
-          
+         <input
+  ref={ref}
+  className={clsx(
+    'block rounded-lg border-gray-300 shadow-sm transition-colors',
+    'bg-white text-stone-800 placeholder-stone-400',
+    'focus:border-amber-600 focus:ring-amber-600',
+    leftIcon ? 'pl-10' : 'pl-4',
+    rightIcon ? 'pr-10' : 'pr-4',
+    error ? 'border-error-500' : 'border-gray-300',
+    fullWidth ? 'w-full' : '',
+    'py-2',
+    className
+  )}
+  {...props}
+/>        
           {rightIcon && (
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
               {rightIcon}
