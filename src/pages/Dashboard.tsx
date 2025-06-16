@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom'; // ✅ useSearchParams importado correctamente
 import { Car, Bookmark, User } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 import TripCard from '../components/trip/TripCard';
@@ -10,23 +10,36 @@ import { Booking } from '../types';
 
 const Dashboard: React.FC = () => {
   const { isAuthenticated, user } = useAuthStore();
-const {
-  myTrips,
-  myBookings,
-  isLoading,
-  error,
-  fetchMyTrips,
-  fetchBookingsForMyTrips, // ✅ usamos la nueva función
-} = useTripStore();
+  const {
+    myTrips,
+    myBookings,
+    isLoading,
+    error,
+    fetchMyTrips,
+    fetchBookingsForMyTrips,
+  } = useTripStore();
+
   const [activeTab, setActiveTab] = useState<'trips' | 'bookings' | 'received' | 'profile'>('trips');
+  const [searchParams] = useSearchParams(); // ✅ correctamente ubicado
 
- useEffect(() => {
-  if (isAuthenticated) {
-    fetchMyTrips();
-    fetchBookingsForMyTrips(); // ✅ nueva función con info de pasajero
-  }
-}, [isAuthenticated, fetchMyTrips, fetchBookingsForMyTrips]);
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (
+      tabParam === 'trips' ||
+      tabParam === 'bookings' ||
+      tabParam === 'received' ||
+      tabParam === 'profile'
+    ) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchMyTrips();
+      fetchBookingsForMyTrips();
+    }
+  }, [isAuthenticated, fetchMyTrips, fetchBookingsForMyTrips]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
@@ -42,9 +55,10 @@ const {
         <div className="container mx-auto px-4">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Mi Panel</h1>
 
+          {/* Tabs de navegación */}
           <div className="mb-8">
             <div className="border-b border-gray-200">
-              <nav className="flex space-x-8">
+              <nav className="flex space-x-8 overflow-x-auto">
                 <button
                   onClick={() => setActiveTab('trips')}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
@@ -96,49 +110,53 @@ const {
             </div>
           </div>
 
+          {/* Error */}
           {error && (
             <div className="p-4 bg-red-50 text-red-700 rounded-lg mb-6">{error}</div>
           )}
 
+          {/* Cargando */}
           {isLoading ? (
             <div className="flex justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
             </div>
           ) : (
             <>
+              {/* Tab: Mis Viajes */}
               {activeTab === 'trips' && (
-  <div>
-    <h2 className="text-xl font-semibold text-gray-900 mb-4">
-      Viajes que has publicado
-    </h2>
-    {myTrips.filter((trip) => trip.availableSeats > 0).length > 0 ? (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {myTrips
-          .filter((trip) => trip.availableSeats > 0)
-          .map((trip) => (
-            <TripCard key={trip.id} trip={trip} />
-          ))}
-      </div>
-    ) : (
-      <div className="bg-white rounded-lg shadow-card p-8 text-center">
-        <Car className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
-          No tienes viajes activos
-        </h3>
-        <p className="text-gray-600 mb-4">
-          Publicá un nuevo viaje para conectar con pasajeros.
-        </p>
-        <a
-          href="/create-trip"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-500 hover:bg-primary-600"
-        >
-          Publicar un Viaje
-        </a>
-      </div>
-    )}
-  </div>
-)}
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                    Viajes que has publicado
+                  </h2>
+                  {myTrips.filter((trip) => trip.availableSeats > 0).length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {myTrips
+                        .filter((trip) => trip.availableSeats > 0)
+                        .map((trip) => (
+                          <TripCard key={trip.id} trip={trip} />
+                        ))}
+                    </div>
+                  ) : (
+                    <div className="bg-white rounded-lg shadow-card p-8 text-center">
+                      <Car className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">
+                        No tienes viajes activos
+                      </h3>
+                      <p className="text-gray-600 mb-4">
+                        Publicá un nuevo viaje para conectar con pasajeros.
+                      </p>
+                      <a
+                        href="/create-trip"
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-500 hover:bg-primary-600"
+                      >
+                        Publicar un Viaje
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
 
+              {/* Tab: Mis Reservas */}
               {activeTab === 'bookings' && (
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">
@@ -175,14 +193,17 @@ const {
                 </div>
               )}
 
-            {activeTab === 'received' && (
-  <div>
-    <h2 className="text-xl font-semibold text-gray-900 mb-4">
-      Reservas que recibiste como conductor
-    </h2>
-    <PendingBookings bookings={myBookings} /> {/* ✅ le pasamos las reservas como prop */}
-  </div>
-)}
+              {/* Tab: Reservas Recibidas */}
+              {activeTab === 'received' && (
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                    Reservas que recibiste como conductor
+                  </h2>
+                  <PendingBookings bookings={myBookings} />
+                </div>
+              )}
+
+              {/* Tab: Mi Perfil */}
               {activeTab === 'profile' && (
                 <div className="bg-white rounded-lg shadow-card p-6">
                   <div className="flex flex-col md:flex-row">
@@ -231,7 +252,7 @@ const {
 
                       <div className="mt-6">
                         <a
-                          href="#"
+                          href="/profile/edit"
                           className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                         >
                           Editar Perfil
