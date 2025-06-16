@@ -11,7 +11,9 @@ import {
   deleteUser,
   updateEmail,
   EmailAuthProvider,
-  reauthenticateWithCredential
+  reauthenticateWithCredential,
+  GoogleAuthProvider,
+  signInWithPopup
 } from 'firebase/auth';
 import Layout from '../components/layout/Layout';
 import { useAuthStore } from '../store/authStore';
@@ -24,16 +26,24 @@ const ProfileEdit: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const reauthenticateUser = async (password: string) => {
+  const reauthenticateUser = async () => {
     const auth = getAuth();
     const currentUser = auth.currentUser;
+    const providerId = currentUser?.providerData[0]?.providerId;
 
-    if (!currentUser || !currentUser.email) {
-      throw new Error('Usuario no autenticado');
+    if (!currentUser) throw new Error('Usuario no autenticado');
+
+    if (providerId === 'google.com') {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } else if (providerId === 'password') {
+      const password = prompt('Por seguridad, ingresá tu contraseña:');
+      if (!currentUser.email || !password) throw new Error('Credenciales faltantes');
+      const credential = EmailAuthProvider.credential(currentUser.email, password);
+      await reauthenticateWithCredential(currentUser, credential);
+    } else {
+      throw new Error('Proveedor no soportado');
     }
-
-    const credential = EmailAuthProvider.credential(currentUser.email, password);
-    await reauthenticateWithCredential(currentUser, credential);
   };
 
   const handleUpdate = async () => {
@@ -55,14 +65,11 @@ const ProfileEdit: React.FC = () => {
       navigate('/dashboard?tab=profile');
     } catch (error: any) {
       if (error.code === 'auth/requires-recent-login') {
-        const password = prompt('Por seguridad, por favor ingresá tu contraseña para continuar:');
-        if (password) {
-          try {
-            await reauthenticateUser(password);
-            return await handleUpdate();
-          } catch {
-            alert('La reautenticación falló. Verificá tu contraseña.');
-          }
+        try {
+          await reauthenticateUser();
+          return await handleUpdate();
+        } catch {
+          alert('La reautenticación falló. Verificá tus credenciales.');
         }
       } else {
         console.error('Error al actualizar perfil:', error);
@@ -78,28 +85,30 @@ const ProfileEdit: React.FC = () => {
 
     const auth = getAuth();
     const db = getFirestore();
+    const currentUser = auth.currentUser;
 
     try {
-      await deleteDoc(doc(db, 'users', user!.id));
-      await deleteUser(auth.currentUser!);
+      const providerId = currentUser?.providerData[0]?.providerId;
+
+      if (providerId === 'google.com') {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+      } else if (providerId === 'password') {
+        const password = prompt('Por seguridad, ingresá tu contraseña:');
+        if (!currentUser?.email || !password) throw new Error('Credenciales faltantes');
+        const credential = EmailAuthProvider.credential(currentUser.email, password);
+        await reauthenticateWithCredential(currentUser, credential);
+      }
+
+      await deleteDoc(doc(db, 'users', currentUser!.uid));
+      await deleteUser(currentUser!);
       await logout();
+
       alert('Tu cuenta ha sido eliminada.');
       navigate('/');
     } catch (error: any) {
-      if (error.code === 'auth/requires-recent-login') {
-        const password = prompt('Por seguridad, por favor ingresá tu contraseña para continuar:');
-        if (password) {
-          try {
-            await reauthenticateUser(password);
-            return await handleDeleteAccount();
-          } catch {
-            alert('La reautenticación falló. Verificá tu contraseña.');
-          }
-        }
-      } else {
-        console.error('Error al eliminar cuenta:', error);
-        alert('Error al eliminar cuenta.');
-      }
+      console.error('Error eliminando cuenta:', error);
+      alert('No se pudo eliminar la cuenta. Quizás necesites volver a iniciar sesión.');
     }
   };
 
