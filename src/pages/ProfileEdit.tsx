@@ -1,105 +1,109 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
-import { getAuth, updateProfile, updateEmail, deleteUser } from 'firebase/auth';
 import { getFirestore, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getAuth, deleteUser, updateEmail } from 'firebase/auth';
 import Layout from '../components/layout/Layout';
-import Input from '../components/ui/Input';
-import Button from '../components/ui/Button';
+import { useAuthStore } from '../store/authStore';
 
 const ProfileEdit: React.FC = () => {
-  const { user, fetchUserData, logout } = useAuthStore();
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
+  const { user, logout } = useAuthStore();
+  const [name, setName] = useState(user?.name || '');
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [email, setEmail] = useState(user?.email || '');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const auth = getAuth();
-  const db = getFirestore();
 
-  useEffect(() => {
-    if (user) {
-      setName(user.name || '');
-      setPhone(user.phone || '');
-      setEmail(user.email || '');
-    }
-  }, [user]);
-
-  const handleSave = async () => {
-    if (!auth.currentUser || !user?.id) return;
-
+  const handleUpdate = async () => {
+    if (!user) return;
     setLoading(true);
+
+    const db = getFirestore();
+    const auth = getAuth();
+    const ref = doc(db, 'users', user.id);
+
     try {
-      // Actualizar en Firebase Auth
-      await updateProfile(auth.currentUser, { displayName: name });
-      if (email !== auth.currentUser.email) {
+      // ✅ Actualizamos en Firebase Auth también si cambia el email
+      if (auth.currentUser && email !== auth.currentUser.email) {
         await updateEmail(auth.currentUser, email);
       }
 
-      // Actualizar en Firestore
-      const userRef = doc(db, 'users', user.id);
-      await updateDoc(userRef, { name, phone, email });
+      // ✅ Actualizamos en Firestore
+      await updateDoc(ref, { name, phone, email });
 
-      await fetchUserData(); // Actualizar estado global
-      alert('Perfil actualizado correctamente');
+      alert('Perfil actualizado correctamente.');
       navigate('/dashboard?tab=profile');
     } catch (error) {
-      console.error('Error al guardar cambios:', error);
-      alert('Hubo un error al guardar los cambios. Es posible que debas volver a iniciar sesión.');
+      console.error('Error al actualizar perfil:', error);
+      alert('Error al actualizar perfil. Es posible que debas reautenticarse.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteAccount = async () => {
-    const confirmed = confirm('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.');
-    if (!confirmed || !auth.currentUser || !user?.id) return;
+    if (!confirm('¿Estás seguro que querés eliminar tu cuenta? Esta acción no se puede deshacer.')) return;
+
+    const auth = getAuth();
+    const db = getFirestore();
 
     try {
-      // Eliminar de Firestore
-      await deleteDoc(doc(db, 'users', user.id));
+      await deleteDoc(doc(db, 'users', user!.id));
+      await deleteUser(auth.currentUser!);
+      await logout();
 
-      // Eliminar de Auth
-      await deleteUser(auth.currentUser);
-
-      await logout(); // Limpiar sesión
       alert('Tu cuenta ha sido eliminada.');
       navigate('/');
     } catch (error) {
       console.error('Error al eliminar cuenta:', error);
-      alert('Hubo un error al eliminar tu cuenta. Es posible que debas volver a iniciar sesión.');
+      alert('Error al eliminar cuenta. Es posible que debas reautenticarse.');
     }
   };
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-10 max-w-xl">
-        <h1 className="text-2xl font-bold mb-6">Editar Perfil</h1>
+      <div className="max-w-lg mx-auto mt-10 bg-white p-6 rounded shadow">
+        <h2 className="text-2xl font-bold mb-6">Editar Perfil</h2>
 
-        <div className="space-y-4">
-          <Input label="Nombre" value={name} onChange={(e) => setName(e.target.value)} />
-          <Input label="Teléfono" value={phone} onChange={(e) => setPhone(e.target.value)} />
-          <Input label="Correo electrónico" value={email} onChange={(e) => setEmail(e.target.value)} />
-        </div>
+        <label className="block mb-2 font-medium">Nombre</label>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full border p-2 rounded mb-4"
+        />
 
-        <div className="mt-6 flex flex-col space-y-4">
-          <Button onClick={handleSave} disabled={loading}>
-            {loading ? 'Guardando...' : 'Guardar Cambios'}
-          </Button>
+        <label className="block mb-2 font-medium">Teléfono</label>
+        <input
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          className="w-full border p-2 rounded mb-4"
+        />
 
-          <button
-            onClick={handleDeleteAccount}
-            className="text-red-500 border border-red-500 px-4 py-2 rounded hover:bg-red-50"
-          >
-            Eliminar Cuenta
-          </button>
-        </div>
+        <label className="block mb-2 font-medium">Email</label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full border p-2 rounded mb-6"
+        />
+
+        <button
+          onClick={handleUpdate}
+          disabled={loading}
+          className="bg-blue-600 text-white px-4 py-2 rounded mr-3"
+        >
+          Guardar Cambios
+        </button>
+
+        <button
+          onClick={handleDeleteAccount}
+          disabled={loading}
+          className="bg-red-600 text-white px-4 py-2 rounded"
+        >
+          Eliminar Cuenta
+        </button>
       </div>
     </Layout>
   );
 };
-
-export default ProfileEdit;
-
 
 export default ProfileEdit;
