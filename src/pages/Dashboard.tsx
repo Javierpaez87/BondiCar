@@ -10,15 +10,23 @@ import { Booking } from '../types';
 
 const Dashboard: React.FC = () => {
   const { isAuthenticated, user } = useAuthStore();
-  const { myTrips, myBookings, isLoading, error, fetchMyTrips, fetchMyBookings } = useTripStore();
+const {
+  myTrips,
+  myBookings,
+  isLoading,
+  error,
+  fetchMyTrips,
+  fetchBookingsForMyTrips, // ✅ usamos la nueva función
+} = useTripStore();
   const [activeTab, setActiveTab] = useState<'trips' | 'bookings' | 'received' | 'profile'>('trips');
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchMyTrips();
-      fetchMyBookings();
-    }
-  }, [isAuthenticated, fetchMyTrips, fetchMyBookings]);
+ useEffect(() => {
+  if (isAuthenticated) {
+    fetchMyTrips();
+    fetchBookingsForMyTrips(); // ✅ nueva función con info de pasajero
+  }
+}, [isAuthenticated, fetchMyTrips, fetchBookingsForMyTrips]);
+
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
@@ -167,15 +175,14 @@ const Dashboard: React.FC = () => {
                 </div>
               )}
 
-              {activeTab === 'received' && (
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                    Reservas que recibiste como conductor
-                  </h2>
-                  <PendingBookings />
-                </div>
-              )}
-
+            {activeTab === 'received' && (
+  <div>
+    <h2 className="text-xl font-semibold text-gray-900 mb-4">
+      Reservas que recibiste como conductor
+    </h2>
+    <PendingBookings bookings={myBookings} /> {/* ✅ le pasamos las reservas como prop */}
+  </div>
+)}
               {activeTab === 'profile' && (
                 <div className="bg-white rounded-lg shadow-card p-6">
                   <div className="flex flex-col md:flex-row">
