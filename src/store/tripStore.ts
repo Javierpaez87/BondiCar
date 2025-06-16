@@ -171,37 +171,40 @@ export const useTripStore = create<TripState>((set, get) => ({
       for (const doc of snapshot.docs) {
         const data = doc.data() as DocumentData;
 
-        const tripSnap = await getDocs(query(
-          collection(db, 'Post Trips'),
-          where('__name__', '==', data.tripId)
-        ));
+        const tripSnap = await getDocs(
+          query(collection(db, 'Post Trips'), where('__name__', '==', data.tripId))
+        );
 
         const tripDoc = tripSnap.docs[0];
-        const tripData = tripDoc?.data();
 
-        if (tripData) {
-          const booking: Booking = {
-            id: doc.id,
-            ...data,
-            createdAt: data.createdAt?.toDate?.() || new Date(),
-            trip: {
-              id: tripDoc.id,
-              ...tripData,
-              departureDate: tripData.departureDate?.toDate?.() || new Date(),
-              createdAt: tripData.createdAt?.toDate?.() || new Date(),
-              driver: {
-                ...tripData.driver,
-                phone: tripData.driver?.phone || '',
-                profilePicture: tripData.driver?.profilePicture || '',
-              },
-            },
-          };
-          bookings.push(booking);
+        if (!tripDoc) {
+          console.warn('⚠️ Trip no encontrado para reserva:', data.tripId);
+          continue;
         }
+
+        const tripData = tripDoc.data();
+
+        const booking: Booking = {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate?.() || new Date(),
+          trip: {
+            id: tripDoc.id,
+            ...tripData,
+            departureDate: tripData.departureDate?.toDate?.() || new Date(),
+            createdAt: tripData.createdAt?.toDate?.() || new Date(),
+            driver: {
+              ...tripData.driver,
+              phone: tripData.driver?.phone || '',
+              profilePicture: tripData.driver?.profilePicture || '',
+            },
+          },
+        };
+
+        bookings.push(booking);
       }
 
       console.log('📦 fetchMyBookings:', bookings);
-
       set({ myBookings: bookings, isLoading: false });
     } catch (error) {
       set({
