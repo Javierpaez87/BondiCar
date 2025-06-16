@@ -17,6 +17,7 @@ const Dashboard: React.FC = () => {
     isLoading,
     error,
     fetchMyTrips,
+    fetchMyBookings,
     fetchBookingsForMyTrips,
   } = useTripStore();
 
@@ -38,9 +39,10 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated) {
       fetchMyTrips();
-      fetchBookingsForMyTrips();
+      fetchMyBookings(); // ✅ Aseguramos que se cargan las reservas hechas como pasajero
+      fetchBookingsForMyTrips(); // ✅ Carga reservas recibidas como conductor
     }
-  }, [isAuthenticated, fetchMyTrips, fetchBookingsForMyTrips]);
+  }, [isAuthenticated, fetchMyTrips, fetchMyBookings, fetchBookingsForMyTrips]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
@@ -60,44 +62,44 @@ const Dashboard: React.FC = () => {
               <nav className="flex space-x-8 overflow-x-auto">
                 <button
                   onClick={() => setActiveTab('trips')}
-                  className={py-4 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'trips'
                       ? 'border-primary-500 text-primary-500'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }}
+                  }`}
                 >
                   <Car className="inline-block h-5 w-5 mr-2" />
                   Mis Viajes Publicados
                 </button>
                 <button
                   onClick={() => setActiveTab('bookings')}
-                  className={py-4 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'bookings'
                       ? 'border-primary-500 text-primary-500'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }}
+                  }`}
                 >
                   <Bookmark className="inline-block h-5 w-5 mr-2" />
                   Mis Reservas
                 </button>
                 <button
                   onClick={() => setActiveTab('received')}
-                  className={py-4 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'received'
                       ? 'border-primary-500 text-primary-500'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }}
+                  }`}
                 >
                   <Bookmark className="inline-block h-5 w-5 mr-2" />
                   Reservas Recibidas
                 </button>
                 <button
                   onClick={() => setActiveTab('profile')}
-                  className={py-4 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'profile'
                       ? 'border-primary-500 text-primary-500'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }}
+                  }`}
                 >
                   <User className="inline-block h-5 w-5 mr-2" />
                   Mi Perfil
