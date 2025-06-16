@@ -8,6 +8,8 @@ import {
   where,
   Timestamp,
   serverTimestamp,
+  doc,
+  getDoc,
   DocumentData,
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
@@ -24,6 +26,7 @@ interface TripState {
   fetchTrips: () => Promise<void>;
   fetchMyTrips: () => Promise<void>;
   fetchMyBookings: () => Promise<void>;
+  fetchBookingsForMyTrips: () => Promise<void>; // ✅ NUEVA
   filterTrips: (filters: TripFilters) => void;
   bookTrip: (tripId: string, seats: number) => Promise<void>;
 }
@@ -106,7 +109,7 @@ export const useTripStore = create<TripState>((set, get) => ({
             },
           };
         })
-        .filter((trip) => trip.availableSeats > 0); // ✅ Oculta viajes sin asientos
+        .filter((trip) => trip.availableSeats > 0);
 
       set({ trips, filteredTrips: trips, isLoading: false });
     } catch (error) {
@@ -206,6 +209,63 @@ export const useTripStore = create<TripState>((set, get) => ({
     }
   },
 
+  // ✅ NUEVA FUNCIÓN
+  fetchBookingsForMyTrips: async () => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const db = getFirestore();
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) throw new Error('No estás autenticado');
+
+      const tripsQuery = query(collection(db, 'Post Trips'), where('driverId', '==', user.uid));
+      const tripsSnapshot = await getDocs(tripsQuery);
+
+      const allBookings: Booking[] = [];
+
+      for (const tripDoc of tripsSnapshot.docs) {
+        const tripId = tripDoc.id;
+
+        const bookingsQuery = query(collection(db, 'Bookings'), where('tripId', '==', tripId));
+        const bookingsSnapshot = await getDocs(bookingsQuery);
+
+        for (const bookingDoc of bookingsSnapshot.docs) {
+          const bookingData = bookingDoc.data();
+          let passengerInfo = { name: '', phone: '' };
+
+          try {
+            const passengerRef = doc(db, 'users', bookingData.passengerId);
+            const passengerSnap = await getDoc(passengerRef);
+            if (passengerSnap.exists()) {
+              const passengerData = passengerSnap.data();
+              passengerInfo = {
+                name: passengerData.name || '',
+                phone: passengerData.phone || '',
+              };
+            }
+          } catch (e) {
+            console.error('Error obteniendo datos del pasajero:', e);
+          }
+
+          allBookings.push({
+            id: bookingDoc.id,
+            ...bookingData,
+            passengerInfo,
+            createdAt: bookingData.createdAt?.toDate?.() || new Date(),
+          } as Booking);
+        }
+      }
+
+      set({ myBookings: allBookings, isLoading: false });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Error al obtener reservas de mis viajes',
+        isLoading: false,
+      });
+    }
+  },
+
   filterTrips: (filters: TripFilters) => {
     const allTrips = get().trips;
     const filtered = allTrips.filter((trip) => {
@@ -247,4 +307,3 @@ export const useTripStore = create<TripState>((set, get) => ({
     }
   },
 }));
-
