@@ -26,7 +26,7 @@ interface TripState {
   fetchTrips: () => Promise<void>;
   fetchMyTrips: () => Promise<void>;
   fetchMyBookings: () => Promise<void>;
-  fetchBookingsForMyTrips: () => Promise<void>; // ✅ NUEVA
+  fetchBookingsForMyTrips: () => Promise<void>;
   filterTrips: (filters: TripFilters) => void;
   bookTrip: (tripId: string, seats: number) => Promise<void>;
 }
@@ -200,6 +200,8 @@ export const useTripStore = create<TripState>((set, get) => ({
         }
       }
 
+      console.log('📦 fetchMyBookings:', bookings);
+
       set({ myBookings: bookings, isLoading: false });
     } catch (error) {
       set({
@@ -209,7 +211,6 @@ export const useTripStore = create<TripState>((set, get) => ({
     }
   },
 
-  // ✅ NUEVA FUNCIÓN
   fetchBookingsForMyTrips: async () => {
     set({ isLoading: true, error: null });
 
