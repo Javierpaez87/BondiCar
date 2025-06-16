@@ -55,7 +55,9 @@ const PendingBookings: React.FC<Props> = ({ bookings }) => {
         <p>No hay reservas pendientes.</p>
       ) : (
         <ul className="space-y-4">
-          {bookings.map((booking) => (
+{bookings
+  .filter((booking) => booking.status === 'pending')
+  .map((booking) => (
             <li
               key={booking.id}
               className="p-4 border rounded flex justify-between items-center bg-gray-50"
