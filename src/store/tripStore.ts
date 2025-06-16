@@ -25,7 +25,7 @@ interface TripState {
   fetchMyTrips: () => Promise<void>;
   fetchMyBookings: () => Promise<void>;
   filterTrips: (filters: TripFilters) => void;
-  bookTrip: (tripId: string, seats: number) => Promise<void>; // ✅ ahora incluye seats
+  bookTrip: (tripId: string, seats: number) => Promise<void>;
 }
 
 export const useTripStore = create<TripState>((set, get) => ({
@@ -91,20 +91,22 @@ export const useTripStore = create<TripState>((set, get) => ({
       const db = getFirestore();
       const snapshot = await getDocs(collection(db, 'Post Trips'));
 
-      const trips: Trip[] = snapshot.docs.map((doc) => {
-        const data = doc.data() as DocumentData;
-        return {
-          id: doc.id,
-          ...data,
-          departureDate: data.departureDate?.toDate?.() || new Date(),
-          createdAt: data.createdAt?.toDate?.() || new Date(),
-          driver: {
-            ...data.driver,
-            phone: data.driver?.phone || '',
-            profilePicture: data.driver?.profilePicture || '',
-          },
-        };
-      });
+      const trips: Trip[] = snapshot.docs
+        .map((doc) => {
+          const data = doc.data() as DocumentData;
+          return {
+            id: doc.id,
+            ...data,
+            departureDate: data.departureDate?.toDate?.() || new Date(),
+            createdAt: data.createdAt?.toDate?.() || new Date(),
+            driver: {
+              ...data.driver,
+              phone: data.driver?.phone || '',
+              profilePicture: data.driver?.profilePicture || '',
+            },
+          };
+        })
+        .filter((trip) => trip.availableSeats > 0); // ✅ Oculta viajes sin asientos
 
       set({ trips, filteredTrips: trips, isLoading: false });
     } catch (error) {
@@ -128,22 +130,16 @@ export const useTripStore = create<TripState>((set, get) => ({
 
       const myTrips: Trip[] = snapshot.docs.map((doc) => {
         const data = doc.data() as DocumentData;
-
-        const driver = data.driver ?? {
-          id: user.uid,
-          name: user.displayName || '',
-          email: user.email || '',
-          phone: '',
-          profilePicture: '',
-          createdAt: new Date(),
-        };
-
         return {
           id: doc.id,
           ...data,
           departureDate: data.departureDate?.toDate?.() || new Date(),
           createdAt: data.createdAt?.toDate?.() || new Date(),
-          driver,
+          driver: {
+            ...data.driver,
+            phone: data.driver?.phone || '',
+            profilePicture: data.driver?.profilePicture || '',
+          },
         };
       });
 
@@ -224,7 +220,6 @@ export const useTripStore = create<TripState>((set, get) => ({
     set({ filteredTrips: filtered });
   },
 
-  // ✅ bookTrip ahora guarda seats
   bookTrip: async (tripId: string, seats: number) => {
     set({ isLoading: true, error: null });
     try {
@@ -236,13 +231,12 @@ export const useTripStore = create<TripState>((set, get) => ({
       const bookingData = {
         tripId,
         passengerId: user.uid,
-        seats, // 🟢 nuevo campo
+        seats,
         status: 'pending',
         createdAt: serverTimestamp(),
       };
 
       await addDoc(collection(db, 'Bookings'), bookingData);
-
       set({ isLoading: false });
     } catch (error) {
       set({
@@ -253,3 +247,4 @@ export const useTripStore = create<TripState>((set, get) => ({
     }
   },
 }));
+
