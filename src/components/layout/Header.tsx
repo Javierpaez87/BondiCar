@@ -69,23 +69,57 @@ const Header: React.FC = () => {
                     )}
                   </div>
                 </button>
-                <div className="absolute right-0 mt-2 w-48 bg-stone-800 rounded-lg shadow-lg py-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 border border-amber-600">
-                  <div className="px-4 py-2 border-b border-stone-600">
-                    <p className="text-sm font-medium text-amber-100">{user?.name}</p>
-                    <p className="text-xs text-stone-400">{user?.email}</p>
-                  </div>
-                  <Link to="/profile" className="flex items-center px-4 py-2 text-sm text-stone-200 hover:bg-stone-700">
-                    <UserIcon className="mr-2 h-4 w-4" />
-                    Mi Perfil
-                  </Link>
-                  <button 
-                    onClick={logout}
-                    className="w-full flex items-center px-4 py-2 text-sm text-red-400 hover:bg-stone-700"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Cerrar Sesión
-                  </button>
-                </div>
+              <div className="absolute right-0 mt-2 w-48 bg-stone-800 rounded-lg shadow-lg py-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 border border-amber-600">
+  <div className="px-4 py-2 border-b border-stone-600">
+    <p className="text-sm font-medium text-amber-100">{user?.name}</p>
+    <p className="text-xs text-stone-400">{user?.email}</p>
+  </div>
+
+  <Link to="/profile" className="flex items-center px-4 py-2 text-sm text-stone-200 hover:bg-stone-700">
+    <UserIcon className="mr-2 h-4 w-4" />
+    Mi Perfil
+  </Link>
+
+  <Link to="/profile/edit" className="flex items-center px-4 py-2 text-sm text-stone-200 hover:bg-stone-700">
+    ✏️
+    <span className="ml-2">Editar Perfil</span>
+  </Link>
+
+  <button
+    onClick={async () => {
+      const confirmDelete = window.confirm('¿Estás seguro de que querés eliminar tu cuenta? Esta acción no se puede deshacer.');
+      if (!confirmDelete) return;
+
+      try {
+        const auth = (await import('firebase/auth')).getAuth();
+        const firestore = (await import('firebase/firestore')).getFirestore();
+        const { deleteDoc, doc } = await import('firebase/firestore');
+
+        if (auth.currentUser) {
+          await deleteDoc(doc(firestore, 'Users', auth.currentUser.uid)); // ajustá 'Users' si tu colección se llama distinto
+          await auth.currentUser.delete();
+          logout();
+          alert('Tu cuenta ha sido eliminada.');
+        }
+      } catch (error) {
+        console.error('Error al eliminar la cuenta:', error);
+        alert('No se pudo eliminar la cuenta. Intentá cerrar sesión y volver a intentar.');
+      }
+    }}
+    className="w-full flex items-center px-4 py-2 text-sm text-red-400 hover:bg-stone-700"
+  >
+    🗑️
+    <span className="ml-2">Eliminar Cuenta</span>
+  </button>
+
+  <button 
+    onClick={logout}
+    className="w-full flex items-center px-4 py-2 text-sm text-red-400 hover:bg-stone-700"
+  >
+    <LogOut className="mr-2 h-4 w-4" />
+    Cerrar Sesión
+  </button>
+</div>
               </div>
             </>
           ) : (
@@ -153,22 +187,58 @@ const Header: React.FC = () => {
                     Publicar Viaje
                   </Link>
                   <Link 
-                    to="/profile" 
-                    className="text-sm font-medium text-stone-200 hover:text-amber-400 transition-colors"
-                    onClick={closeMenu}
-                  >
-                    Mi Perfil
-                  </Link>
-                  <button 
-                    onClick={() => {
-                      logout();
-                      closeMenu();
-                    }}
-                    className="flex items-center text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Cerrar Sesión
-                  </button>
+  to="/profile" 
+  className="text-sm font-medium text-stone-200 hover:text-amber-400 transition-colors"
+  onClick={closeMenu}
+>
+  🧑 Mi Perfil
+</Link>
+
+<Link 
+  to="/profile/edit" 
+  className="text-sm font-medium text-stone-200 hover:text-amber-400 transition-colors"
+  onClick={closeMenu}
+>
+  ✏️ Editar Perfil
+</Link>
+
+<button
+  onClick={async () => {
+    const confirmDelete = window.confirm('¿Estás seguro de que querés eliminar tu cuenta? Esta acción no se puede deshacer.');
+    if (!confirmDelete) return;
+
+    try {
+      const auth = (await import('firebase/auth')).getAuth();
+      const firestore = (await import('firebase/firestore')).getFirestore();
+      const { deleteDoc, doc } = await import('firebase/firestore');
+
+      if (auth.currentUser) {
+        await deleteDoc(doc(firestore, 'Users', auth.currentUser.uid)); // o 'users' si es minúscula en tu DB
+        await auth.currentUser.delete();
+        logout();
+        alert('Tu cuenta ha sido eliminada.');
+        closeMenu();
+      }
+    } catch (error) {
+      console.error('Error al eliminar la cuenta:', error);
+      alert('No se pudo eliminar la cuenta. Intentá cerrar sesión y volver a intentar.');
+    }
+  }}
+  className="text-sm font-medium text-red-400 hover:text-red-300 transition-colors text-left"
+>
+  🗑️ Eliminar Cuenta
+</button>
+
+<button 
+  onClick={() => {
+    logout();
+    closeMenu();
+  }}
+  className="flex items-center text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
+>
+  <LogOut className="mr-2 h-4 w-4" />
+  Cerrar Sesión
+</button>
                 </>
               ) : (
                 <div className="flex flex-col space-y-3">
