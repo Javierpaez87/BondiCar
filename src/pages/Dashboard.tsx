@@ -35,11 +35,12 @@ const Dashboard: React.FC = () => {
   }, [searchParams]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchMyTrips();
-      fetchBookingsForMyTrips();
-    }
-  }, [isAuthenticated, fetchMyTrips, fetchBookingsForMyTrips]);
+  if (isAuthenticated) {
+    fetchMyTrips();
+    fetchMyBookings(); // ✅ Agregamos esta línea
+    fetchBookingsForMyTrips();
+  }
+}, [isAuthenticated, fetchMyTrips, fetchMyBookings, fetchBookingsForMyTrips]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
