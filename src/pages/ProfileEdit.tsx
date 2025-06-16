@@ -1,7 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getFirestore, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { getAuth, deleteUser, updateEmail } from 'firebase/auth';
+import {
+  getFirestore,
+  doc,
+  updateDoc,
+  deleteDoc
+} from 'firebase/firestore';
+import {
+  getAuth,
+  deleteUser,
+  updateEmail,
+  EmailAuthProvider,
+  reauthenticateWithCredential
+} from 'firebase/auth';
 import Layout from '../components/layout/Layout';
 import { useAuthStore } from '../store/authStore';
 
@@ -13,6 +24,18 @@ const ProfileEdit: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const reauthenticateUser = async (password: string) => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+
+    if (!currentUser || !currentUser.email) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    const credential = EmailAuthProvider.credential(currentUser.email, password);
+    await reauthenticateWithCredential(currentUser, credential);
+  };
+
   const handleUpdate = async () => {
     if (!user) return;
     setLoading(true);
@@ -22,19 +45,29 @@ const ProfileEdit: React.FC = () => {
     const ref = doc(db, 'users', user.id);
 
     try {
-      // ✅ Actualizamos en Firebase Auth también si cambia el email
       if (auth.currentUser && email !== auth.currentUser.email) {
         await updateEmail(auth.currentUser, email);
       }
 
-      // ✅ Actualizamos en Firestore
       await updateDoc(ref, { name, phone, email });
 
       alert('Perfil actualizado correctamente.');
       navigate('/dashboard?tab=profile');
-    } catch (error) {
-      console.error('Error al actualizar perfil:', error);
-      alert('Error al actualizar perfil. Es posible que debas reautenticarse.');
+    } catch (error: any) {
+      if (error.code === 'auth/requires-recent-login') {
+        const password = prompt('Por seguridad, por favor ingresá tu contraseña para continuar:');
+        if (password) {
+          try {
+            await reauthenticateUser(password);
+            return await handleUpdate();
+          } catch {
+            alert('La reautenticación falló. Verificá tu contraseña.');
+          }
+        }
+      } else {
+        console.error('Error al actualizar perfil:', error);
+        alert('Error al actualizar perfil.');
+      }
     } finally {
       setLoading(false);
     }
@@ -50,12 +83,23 @@ const ProfileEdit: React.FC = () => {
       await deleteDoc(doc(db, 'users', user!.id));
       await deleteUser(auth.currentUser!);
       await logout();
-
       alert('Tu cuenta ha sido eliminada.');
       navigate('/');
-    } catch (error) {
-      console.error('Error al eliminar cuenta:', error);
-      alert('Error al eliminar cuenta. Es posible que debas reautenticarse.');
+    } catch (error: any) {
+      if (error.code === 'auth/requires-recent-login') {
+        const password = prompt('Por seguridad, por favor ingresá tu contraseña para continuar:');
+        if (password) {
+          try {
+            await reauthenticateUser(password);
+            return await handleDeleteAccount();
+          } catch {
+            alert('La reautenticación falló. Verificá tu contraseña.');
+          }
+        }
+      } else {
+        console.error('Error al eliminar cuenta:', error);
+        alert('Error al eliminar cuenta.');
+      }
     }
   };
 
@@ -80,7 +124,6 @@ const ProfileEdit: React.FC = () => {
 
         <label className="block mb-2 font-medium">Email</label>
         <input
-          type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full border p-2 rounded mb-6"
