@@ -56,7 +56,7 @@ const Search: React.FC = () => {
 
   const handleConfirmBooking = async (tripId: string, seats: number) => {
     try {
-      await bookTrip(tripId, seats); // ✅ seats correctamente enviado
+      await bookTrip(tripId, seats);
       alert('Reserva enviada al conductor');
       setSelectedTrip(null);
     } catch (error) {
@@ -79,7 +79,7 @@ const Search: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-900">
               {isLoading
                 ? 'Cargando viajes...'
-                : `${filteredTrips.length} viajes encontrados`}
+                : `${filteredTrips.filter((t) => t.availableSeats > 0).length} viajes encontrados`}
             </h2>
           </div>
 
@@ -95,14 +95,16 @@ const Search: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredTrips.length > 0 ? (
-                filteredTrips.map((trip) => (
-                  <TripCard
-                    key={trip.id}
-                    trip={trip}
-                    onBook={handleBookTrip}
-                  />
-                ))
+              {filteredTrips.filter((trip) => trip.availableSeats > 0).length > 0 ? (
+                filteredTrips
+                  .filter((trip) => trip.availableSeats > 0)
+                  .map((trip) => (
+                    <TripCard
+                      key={trip.id}
+                      trip={trip}
+                      onBook={handleBookTrip}
+                    />
+                  ))
               ) : (
                 <div className="col-span-3 text-center py-12">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -130,3 +132,4 @@ const Search: React.FC = () => {
 };
 
 export default Search;
+
