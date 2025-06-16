@@ -8,6 +8,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
+import { getFirestore, setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { auth } from '../config/firebase';
 import { User } from '../types';
 
@@ -19,7 +20,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, phone: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  loginWithGoogle: () => Promise<void>; // 👈 NUEVO MÉTODO
+  loginWithGoogle: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -63,13 +64,19 @@ export const useAuthStore = create<AuthState>((set) => ({
   register: async (name, email, phone, password) => {
     set({ isLoading: true, error: null });
     try {
+      const db = getFirestore();
       const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, email, password);
-      
-      // Update the user's profile with their name
-      await updateProfile(firebaseUser, {
-        displayName: name
+
+      await updateProfile(firebaseUser, { displayName: name });
+
+      // ✅ Guardar perfil en Firestore
+      await setDoc(doc(db, 'users', firebaseUser.uid), {
+        name,
+        email,
+        phone,
+        createdAt: serverTimestamp(),
       });
-      
+
       set({
         user: {
           id: firebaseUser.uid,
@@ -113,12 +120,20 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  // 🔐 LOGIN CON GOOGLE
   loginWithGoogle: async () => {
     set({ isLoading: true, error: null });
     try {
       const provider = new GoogleAuthProvider();
       const { user: firebaseUser } = await signInWithPopup(auth, provider);
+      const db = getFirestore();
+
+      // ✅ Guardar perfil en Firestore si no existe
+      await setDoc(doc(db, 'users', firebaseUser.uid), {
+        name: firebaseUser.displayName || '',
+        email: firebaseUser.email || '',
+        phone: firebaseUser.phoneNumber || '',
+        createdAt: serverTimestamp(),
+      }, { merge: true });
 
       set({
         user: {
@@ -162,3 +177,4 @@ onAuthStateChanged(auth, (firebaseUser) => {
     });
   }
 });
+
