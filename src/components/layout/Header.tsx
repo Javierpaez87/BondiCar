@@ -10,13 +10,12 @@ const Header: React.FC = () => {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
-
   const isActive = (path: string) => location.pathname === path;
 
   return (
     <header className="bg-gradient-to-r from-stone-800 via-stone-700 to-stone-800 sticky top-0 z-50 shadow-lg border-b-2 border-amber-600">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        {/* Logo con montañas */}
+        {/* Logo */}
         <Link to="/" className="flex items-center space-x-3">
           <div className="relative">
             <svg className="h-10 w-12 text-stone-600 absolute -top-1 -left-1" viewBox="0 0 48 40" fill="currentColor">
