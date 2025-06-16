@@ -7,6 +7,7 @@ import {
   where,
   updateDoc,
   doc,
+  getDoc,
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { Booking } from '../types';
@@ -36,7 +37,7 @@ const PendingBookings: React.FC = () => {
       return;
     }
 
-    // Traer reservas que correspondan a esos viajes y estén en estado "pending"
+    // Traer reservas pendientes relacionadas
     const bookingsSnapshot = await getDocs(
       query(collection(db, 'Bookings'), where('status', '==', 'pending'))
     );
@@ -59,8 +60,37 @@ const PendingBookings: React.FC = () => {
 
   const updateBookingStatus = async (bookingId: string, status: 'accepted' | 'rejected') => {
     const db = getFirestore();
-    await updateDoc(doc(db, 'Bookings', bookingId), { status });
-    await fetchPendingBookings(); // actualizar la lista
+
+    // Obtener la reserva
+    const bookingRef = doc(db, 'Bookings', bookingId);
+    const bookingSnap = await getDoc(bookingRef);
+
+    if (!bookingSnap.exists()) return;
+
+    const bookingData = bookingSnap.data();
+    const { tripId, seats } = bookingData;
+
+    // Si se acepta la reserva, actualizar asientos del viaje
+    if (status === 'accepted') {
+      const tripRef = doc(db, 'Post Trips', tripId);
+      const tripSnap = await getDoc(tripRef);
+
+      if (tripSnap.exists()) {
+        const tripData = tripSnap.data();
+        const currentSeats = tripData?.availableSeats ?? 0;
+        const updatedSeats = currentSeats - seats;
+
+        await updateDoc(tripRef, {
+          availableSeats: updatedSeats > 0 ? updatedSeats : 0,
+        });
+      }
+    }
+
+    // Actualizar el estado de la reserva
+    await updateDoc(bookingRef, { status });
+
+    // Refrescar reservas pendientes
+    await fetchPendingBookings();
   };
 
   useEffect(() => {
