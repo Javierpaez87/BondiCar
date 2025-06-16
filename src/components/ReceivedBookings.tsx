@@ -11,8 +11,11 @@ interface Props {
   bookings: Booking[];
 }
 
-const PendingBookings: React.FC<Props> = ({ bookings }) => {
-  const updateBookingStatus = async (bookingId: string, status: 'accepted' | 'rejected') => {
+const ReceivedBookings: React.FC<Props> = ({ bookings }) => {
+  const updateBookingStatus = async (
+    bookingId: string,
+    status: 'accepted' | 'rejected'
+  ) => {
     const db = getFirestore();
 
     // Obtener la reserva
@@ -43,21 +46,19 @@ const PendingBookings: React.FC<Props> = ({ bookings }) => {
     // Actualizar el estado de la reserva
     await updateDoc(bookingRef, { status });
 
-    // 👉 Podés agregar lógica aquí para mostrar una notificación o refrescar la UI si es necesario
     alert(`Reserva ${status === 'accepted' ? 'aceptada' : 'rechazada'} correctamente.`);
+    // ⚠️ Si querés refrescar desde el padre, se debe llamar a fetchMyTrips()
   };
 
   return (
     <div className="p-4 bg-white rounded shadow-md">
-      <h2 className="text-xl font-semibold mb-4">Reservas pendientes</h2>
+      <h2 className="text-xl font-semibold mb-4">Reservas recibidas</h2>
 
       {bookings.length === 0 ? (
-        <p>No hay reservas pendientes.</p>
+        <p>No hay reservas.</p>
       ) : (
         <ul className="space-y-4">
-{bookings
-  .filter((booking) => booking.status === 'pending')
-  .map((booking) => (
+          {bookings.map((booking) => (
             <li
               key={booking.id}
               className="p-4 border rounded flex justify-between items-center bg-gray-50"
@@ -66,21 +67,30 @@ const PendingBookings: React.FC<Props> = ({ bookings }) => {
                 <p><strong>Pasajero:</strong> {booking.passengerInfo?.name || 'No disponible'}</p>
                 <p><strong>Teléfono:</strong> {booking.passengerInfo?.phone || 'No disponible'}</p>
                 <p><strong>Asientos solicitados:</strong> {booking.seats}</p>
+                <p>
+                  <strong>Estado:</strong>{' '}
+                  {booking.status === 'pending' && '⏳ Pendiente'}
+                  {booking.status === 'accepted' && '✅ Aceptada'}
+                  {booking.status === 'rejected' && '❌ Rechazada'}
+                </p>
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => updateBookingStatus(booking.id, 'accepted')}
-                  className="bg-green-600 text-white px-3 py-1 rounded"
-                >
-                  Aceptar
-                </button>
-                <button
-                  onClick={() => updateBookingStatus(booking.id, 'rejected')}
-                  className="bg-red-500 text-white px-3 py-1 rounded"
-                >
-                  Rechazar
-                </button>
-              </div>
+
+              {booking.status === 'pending' && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => updateBookingStatus(booking.id, 'accepted')}
+                    className="bg-green-600 text-white px-3 py-1 rounded"
+                  >
+                    Aceptar
+                  </button>
+                  <button
+                    onClick={() => updateBookingStatus(booking.id, 'rejected')}
+                    className="bg-red-500 text-white px-3 py-1 rounded"
+                  >
+                    Rechazar
+                  </button>
+                </div>
+              )}
             </li>
           ))}
         </ul>
@@ -89,4 +99,4 @@ const PendingBookings: React.FC<Props> = ({ bookings }) => {
   );
 };
 
-export default PendingBookings;
+export default ReceivedBookings;
