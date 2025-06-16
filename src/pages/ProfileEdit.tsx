@@ -2,18 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { getAuth, updateProfile, updateEmail, deleteUser } from 'firebase/auth';
+import { getFirestore, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import Layout from '../components/layout/Layout';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 
 const ProfileEdit: React.FC = () => {
-  const { user, fetchUserData } = useAuthStore();
+  const { user, fetchUserData, logout } = useAuthStore();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const auth = getAuth();
+  const db = getFirestore();
 
   useEffect(() => {
     if (user) {
@@ -24,28 +26,26 @@ const ProfileEdit: React.FC = () => {
   }, [user]);
 
   const handleSave = async () => {
-    if (!auth.currentUser) return;
+    if (!auth.currentUser || !user?.id) return;
 
     setLoading(true);
     try {
-      // Actualizar nombre
+      // Actualizar en Firebase Auth
       await updateProfile(auth.currentUser, { displayName: name });
-
-      // Actualizar email
       if (email !== auth.currentUser.email) {
         await updateEmail(auth.currentUser, email);
       }
 
-      // Actualizar en Firestore (opcional según cómo guardes el user)
-      // await updateUserInFirestore(auth.currentUser.uid, { name, phone, email });
+      // Actualizar en Firestore
+      const userRef = doc(db, 'users', user.id);
+      await updateDoc(userRef, { name, phone, email });
 
-      // Actualizar en estado global
-      await fetchUserData();
-
+      await fetchUserData(); // Actualizar estado global
+      alert('Perfil actualizado correctamente');
       navigate('/dashboard?tab=profile');
     } catch (error) {
-      console.error('Error al guardar:', error);
-      alert('Hubo un error al guardar los cambios.');
+      console.error('Error al guardar cambios:', error);
+      alert('Hubo un error al guardar los cambios. Es posible que debas volver a iniciar sesión.');
     } finally {
       setLoading(false);
     }
@@ -53,15 +53,21 @@ const ProfileEdit: React.FC = () => {
 
   const handleDeleteAccount = async () => {
     const confirmed = confirm('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.');
-    if (!confirmed || !auth.currentUser) return;
+    if (!confirmed || !auth.currentUser || !user?.id) return;
 
     try {
+      // Eliminar de Firestore
+      await deleteDoc(doc(db, 'users', user.id));
+
+      // Eliminar de Auth
       await deleteUser(auth.currentUser);
+
+      await logout(); // Limpiar sesión
       alert('Tu cuenta ha sido eliminada.');
       navigate('/');
     } catch (error) {
       console.error('Error al eliminar cuenta:', error);
-      alert('Hubo un error al eliminar tu cuenta.');
+      alert('Hubo un error al eliminar tu cuenta. Es posible que debas volver a iniciar sesión.');
     }
   };
 
@@ -92,5 +98,8 @@ const ProfileEdit: React.FC = () => {
     </Layout>
   );
 };
+
+export default ProfileEdit;
+
 
 export default ProfileEdit;
