@@ -8,8 +8,8 @@ import Register from './pages/Auth/Register';
 import Search from './pages/Search';
 import CreateTrip from './pages/CreateTrip';
 import Dashboard from './pages/Dashboard';
-import ProfileEdit from './pages/ProfileEdit'; // ✅ NUEVO
-// import Profile from './pages/Profile'; // (solo si tenés esta pantalla)
+import Profile from './pages/Profile'; // ✅ nuevo
+import ProfileEdit from './pages/ProfileEdit'; // ✅ nuevo
 
 // Auth Store
 import { useAuthStore } from './store/authStore';
@@ -21,7 +21,12 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  
+  return <>{children}</>;
 };
 
 function App() {
@@ -32,39 +37,40 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/search" element={<Search />} />
-        <Route
-          path="/create-trip"
+
+        <Route 
+          path="/create-trip" 
           element={
             <ProtectedRoute>
               <CreateTrip />
             </ProtectedRoute>
-          }
+          } 
         />
-        <Route
-          path="/dashboard"
+        <Route 
+          path="/dashboard" 
           element={
             <ProtectedRoute>
               <Dashboard />
             </ProtectedRoute>
-          }
+          } 
         />
-        <Route
-          path="/profile/edit"
-          element={
-            <ProtectedRoute>
-              <ProfileEdit />
-            </ProtectedRoute>
-          }
-        />
-        {/* <Route
-          path="/profile"
+        <Route 
+          path="/profile" 
           element={
             <ProtectedRoute>
               <Profile />
             </ProtectedRoute>
-          }
-        /> */}
-
+          } 
+        />
+        <Route 
+          path="/profile/edit" 
+          element={
+            <ProtectedRoute>
+              <ProfileEdit />
+            </ProtectedRoute>
+          } 
+        />
+        
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
