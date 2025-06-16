@@ -1,63 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   getFirestore,
-  collection,
-  getDocs,
-  query,
-  where,
   updateDoc,
   doc,
   getDoc,
 } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
 import { Booking } from '../types';
 
-const PendingBookings: React.FC = () => {
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
+interface Props {
+  bookings: Booking[];
+}
 
-  const fetchPendingBookings = async () => {
-    setLoading(true);
-    const db = getFirestore();
-    const auth = getAuth();
-    const user = auth.currentUser;
-
-    if (!user) return;
-
-    // Traer los viajes del conductor
-    const tripsSnapshot = await getDocs(
-      query(collection(db, 'Post Trips'), where('driverId', '==', user.uid))
-    );
-
-    const tripIds = tripsSnapshot.docs.map((doc) => doc.id);
-
-    if (tripIds.length === 0) {
-      setBookings([]);
-      setLoading(false);
-      return;
-    }
-
-    // Traer reservas pendientes relacionadas
-    const bookingsSnapshot = await getDocs(
-      query(collection(db, 'Bookings'), where('status', '==', 'pending'))
-    );
-
-    const matchingBookings: Booking[] = [];
-
-    for (const docSnap of bookingsSnapshot.docs) {
-      const data = docSnap.data();
-      if (tripIds.includes(data.tripId)) {
-        matchingBookings.push({
-          id: docSnap.id,
-          ...data,
-        } as Booking);
-      }
-    }
-
-    setBookings(matchingBookings);
-    setLoading(false);
-  };
-
+const PendingBookings: React.FC<Props> = ({ bookings }) => {
   const updateBookingStatus = async (bookingId: string, status: 'accepted' | 'rejected') => {
     const db = getFirestore();
 
@@ -89,28 +43,26 @@ const PendingBookings: React.FC = () => {
     // Actualizar el estado de la reserva
     await updateDoc(bookingRef, { status });
 
-    // Refrescar reservas pendientes
-    await fetchPendingBookings();
+    // 👉 Podés agregar lógica aquí para mostrar una notificación o refrescar la UI si es necesario
+    alert(`Reserva ${status === 'accepted' ? 'aceptada' : 'rechazada'} correctamente.`);
   };
-
-  useEffect(() => {
-    fetchPendingBookings();
-  }, []);
 
   return (
     <div className="p-4 bg-white rounded shadow-md">
       <h2 className="text-xl font-semibold mb-4">Reservas pendientes</h2>
 
-      {loading ? (
-        <p>Cargando...</p>
-      ) : bookings.length === 0 ? (
+      {bookings.length === 0 ? (
         <p>No hay reservas pendientes.</p>
       ) : (
         <ul className="space-y-4">
           {bookings.map((booking) => (
-            <li key={booking.id} className="p-4 border rounded flex justify-between items-center">
+            <li
+              key={booking.id}
+              className="p-4 border rounded flex justify-between items-center bg-gray-50"
+            >
               <div>
-                <p><strong>Viaje ID:</strong> {booking.tripId}</p>
+                <p><strong>Pasajero:</strong> {booking.passengerInfo?.name || 'No disponible'}</p>
+                <p><strong>Teléfono:</strong> {booking.passengerInfo?.phone || 'No disponible'}</p>
                 <p><strong>Asientos solicitados:</strong> {booking.seats}</p>
               </div>
               <div className="flex gap-2">
