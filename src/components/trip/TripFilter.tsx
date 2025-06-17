@@ -50,7 +50,7 @@ const TripFilter: React.FC<TripFilterProps> = ({ onFilter }) => {
             placeholder="¿Desde dónde sales?"
             value={origin}
             onChange={(e) => setOrigin(e.target.value)}
-            leftIcon={<MapPin className="h-5 w-5 text-gray-400" />}
+            leftIcon={<MapPin className="h-5 w-5 text-emerald-500" />}
           />
           
           <Input
@@ -58,7 +58,7 @@ const TripFilter: React.FC<TripFilterProps> = ({ onFilter }) => {
             placeholder="¿A dónde vas?"
             value={destination}
             onChange={(e) => setDestination(e.target.value)}
-            leftIcon={<MapPin className="h-5 w-5 text-gray-400" />}
+            leftIcon={<MapPin className="h-5 w-5 text-blue-500" />}
           />
           
           <Input
@@ -66,7 +66,7 @@ const TripFilter: React.FC<TripFilterProps> = ({ onFilter }) => {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            leftIcon={<Calendar className="h-5 w-5 text-gray-400" />}
+            leftIcon={<Calendar className="h-5 w-5 text-teal-500" />}
           />
           
           <Input
@@ -76,7 +76,7 @@ const TripFilter: React.FC<TripFilterProps> = ({ onFilter }) => {
             placeholder="1"
             value={minSeats}
             onChange={(e) => setMinSeats(e.target.value)}
-            leftIcon={<Users className="h-5 w-5 text-gray-400" />}
+            leftIcon={<Users className="h-5 w-5 text-emerald-500" />}
           />
           
           <Input
@@ -86,7 +86,7 @@ const TripFilter: React.FC<TripFilterProps> = ({ onFilter }) => {
             placeholder="Precio máximo"
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
-            leftIcon={<DollarSign className="h-5 w-5 text-gray-400" />}
+            leftIcon={<DollarSign className="h-5 w-5 text-blue-500" />}
           />
         </div>
         
@@ -95,6 +95,7 @@ const TripFilter: React.FC<TripFilterProps> = ({ onFilter }) => {
             type="submit" 
             variant="primary" 
             icon={<Search className="h-4 w-4" />}
+            className="bg-emerald-600 hover:bg-emerald-700"
           >
             Buscar
           </Button>
@@ -103,6 +104,7 @@ const TripFilter: React.FC<TripFilterProps> = ({ onFilter }) => {
             type="button" 
             variant="outline" 
             onClick={handleReset}
+            className="border-gray-300 text-gray-700 hover:bg-gray-50"
           >
             Limpiar filtros
           </Button>

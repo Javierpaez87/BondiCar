@@ -23,8 +23,8 @@ const TripCard: React.FC<TripCardProps> = ({
     if (!isReserved) return null;
 
     const badgeStyles = {
-      pending: 'bg-amber-100 text-amber-800',
-      confirmed: 'bg-green-100 text-green-800',
+      pending: 'bg-blue-100 text-blue-800',
+      confirmed: 'bg-emerald-100 text-emerald-800',
       rejected: 'bg-red-100 text-red-800',
       cancelled: 'bg-gray-100 text-gray-800',
     };
@@ -59,8 +59,8 @@ const TripCard: React.FC<TripCardProps> = ({
                 className="h-full w-full object-cover"
               />
             ) : (
-              <div className="h-full w-full bg-primary-100 flex items-center justify-center">
-                <span className="text-primary-500 font-medium">
+              <div className="h-full w-full bg-emerald-100 flex items-center justify-center">
+                <span className="text-emerald-600 font-medium">
                   {trip.driver.name.substring(0, 2).toUpperCase()}
                 </span>
               </div>
@@ -79,17 +79,17 @@ const TripCard: React.FC<TripCardProps> = ({
 
           <div className="grid grid-cols-2 gap-2 mt-3">
             <div className="flex items-center text-sm text-gray-600">
-              <Calendar className="h-4 w-4 text-primary-500 mr-1" />
+              <Calendar className="h-4 w-4 text-emerald-500 mr-1" />
               <span>{formattedDate}</span>
             </div>
 
             <div className="flex items-center text-sm text-gray-600">
-              <Clock className="h-4 w-4 text-primary-500 mr-1" />
+              <Clock className="h-4 w-4 text-blue-500 mr-1" />
               <span>{trip.departureTime}</span>
             </div>
 
             <div className="flex items-center text-sm text-gray-600">
-              <Users className="h-4 w-4 text-primary-500 mr-1" />
+              <Users className="h-4 w-4 text-teal-500 mr-1" />
               <span>
                 {trip.availableSeats}{' '}
                 {trip.availableSeats === 1 ? 'asiento' : 'asientos'}
@@ -97,14 +97,14 @@ const TripCard: React.FC<TripCardProps> = ({
             </div>
 
             <div className="flex items-center text-sm text-gray-600">
-              <DollarSign className="h-4 w-4 text-primary-500 mr-1" />
+              <DollarSign className="h-4 w-4 text-emerald-500 mr-1" />
               <span>${trip.price}</span>
             </div>
           </div>
 
           {trip.carModel && (
             <div className="flex items-center text-sm text-gray-600 mt-1">
-              <Car className="h-4 w-4 text-primary-500 mr-1" />
+              <Car className="h-4 w-4 text-blue-500 mr-1" />
               <span>
                 {trip.carModel} • {trip.carColor}
               </span>
@@ -114,12 +114,12 @@ const TripCard: React.FC<TripCardProps> = ({
           <div className="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
             <div className="flex space-x-2">
               <div className="flex items-center text-sm">
-                <MapPin className="h-4 w-4 text-primary-500 mr-1" />
+                <MapPin className="h-4 w-4 text-emerald-500 mr-1" />
                 <span className="text-gray-600">{trip.origin}</span>
               </div>
               <span className="text-gray-400">→</span>
               <div className="flex items-center text-sm">
-                <MapPin className="h-4 w-4 text-primary-500 mr-1" />
+                <MapPin className="h-4 w-4 text-blue-500 mr-1" />
                 <span className="text-gray-600">{trip.destination}</span>
               </div>
             </div>
@@ -150,6 +150,7 @@ const TripCard: React.FC<TripCardProps> = ({
                   variant="primary"
                   size="sm"
                   onClick={() => onBook(trip)}
+                  className="bg-emerald-600 hover:bg-emerald-700"
                 >
                   Reservar
                 </Button>
