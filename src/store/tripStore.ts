@@ -12,7 +12,7 @@ import {
   getDoc,
   DocumentData,
 } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { Trip, Booking, TripFilters } from '../types';
 
 interface TripState {
@@ -156,62 +156,70 @@ export const useTripStore = create<TripState>((set, get) => ({
   },
 
   fetchMyBookings: async () => {
-  set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null });
 
-  try {
-    const db = getFirestore();
     const auth = getAuth();
-    const user = auth.currentUser;
-    if (!user) throw new Error('No estás autenticado');
-
-    const q = query(collection(db, 'Bookings'), where('passengerId', '==', user.uid));
-    const snapshot = await getDocs(q);
-
-    const bookings: Booking[] = [];
-
-    for (const docSnap of snapshot.docs) {
-      const data = docSnap.data() as DocumentData;
-
-      let trip = null;
-      if (data.tripId) {
-        const tripRef = doc(db, 'Post Trips', data.tripId);
-        const tripSnap = await getDoc(tripRef);
-        if (tripSnap.exists()) {
-          const tripData = tripSnap.data();
-          trip = {
-            id: tripSnap.id,
-            ...tripData,
-            departureDate: tripData?.departureDate?.toDate?.() || new Date(),
-            createdAt: tripData?.createdAt?.toDate?.() || new Date(),
-            driver: {
-              ...tripData.driver,
-              phone: tripData.driver?.phone || '',
-              profilePicture: tripData.driver?.profilePicture || '',
-            },
-          };
-        } else {
-          console.warn('⚠️ Trip no encontrado para reserva:', data.tripId);
+    return new Promise<void>((resolve) => {
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          console.error('⚠️ Usuario no autenticado en fetchMyBookings');
+          set({ myBookings: [], error: 'Usuario no autenticado.', isLoading: false });
+          return resolve();
         }
-      }
 
-      bookings.push({
-        id: docSnap.id,
-        ...data,
-        createdAt: data.createdAt?.toDate?.() || new Date(),
-        trip,
+        try {
+          const db = getFirestore();
+          const q = query(collection(db, 'Bookings'), where('passengerId', '==', user.uid));
+          const snapshot = await getDocs(q);
+
+          const bookings: Booking[] = [];
+
+          for (const docSnap of snapshot.docs) {
+            const data = docSnap.data() as DocumentData;
+
+            let trip = null;
+            if (data.tripId) {
+              const tripRef = doc(db, 'Post Trips', data.tripId);
+              const tripSnap = await getDoc(tripRef);
+              if (tripSnap.exists()) {
+                const tripData = tripSnap.data();
+                trip = {
+                  id: tripSnap.id,
+                  ...tripData,
+                  departureDate: tripData?.departureDate?.toDate?.() || new Date(),
+                  createdAt: tripData?.createdAt?.toDate?.() || new Date(),
+                  driver: {
+                    ...tripData.driver,
+                    phone: tripData.driver?.phone || '',
+                    profilePicture: tripData.driver?.profilePicture || '',
+                  },
+                };
+              }
+            }
+
+            bookings.push({
+              id: docSnap.id,
+              ...data,
+              createdAt: data.createdAt?.toDate?.() || new Date(),
+              trip,
+            });
+          }
+
+          console.log('📦 fetchMyBookings:', bookings);
+          set({ myBookings: bookings, isLoading: false });
+          resolve();
+        } catch (error) {
+          console.error('❌ Error en fetchMyBookings:', error);
+          set({
+            error: error instanceof Error ? error.message : 'Error al obtener reservas',
+            isLoading: false,
+          });
+          resolve();
+        }
       });
-    }
-
-    console.log('📦 fetchMyBookings:', bookings);
-    set({ myBookings: bookings, isLoading: false });
-  } catch (error) {
-    console.error('❌ Error en fetchMyBookings:', error);
-    set({
-      error: error instanceof Error ? error.message : 'Error al obtener reservas',
-      isLoading: false,
     });
-  }
-},
+  },
+
   fetchBookingsForMyTrips: async () => {
     set({ isLoading: true, error: null });
 
