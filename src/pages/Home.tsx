@@ -17,8 +17,8 @@ const Home: React.FC = () => {
   
   return (
     <Layout>
-      {/* Hero Section - Verde y azul */}
-      <section className="relative bg-gradient-to-br from-stone-800 via-teal-800 to-blue-900 text-emerald-50 py-16 md:py-24 overflow-hidden">
+      {/* Hero Section - Solo verdes */}
+      <section className="relative bg-gradient-to-br from-emerald-900 via-teal-800 to-emerald-800 text-emerald-50 py-16 md:py-24 overflow-hidden">
         {/* Decoración de montañas de fondo */}
         <div className="absolute inset-0 opacity-10">
           <svg className="w-full h-full" viewBox="0 0 1200 600" fill="currentColor">
@@ -111,7 +111,7 @@ const Home: React.FC = () => {
       </section>
       
       {/* Features Section - Verde suave */}
-      <section className="py-16 bg-gradient-to-b from-emerald-50 to-blue-50">
+      <section className="py-16 bg-gradient-to-b from-emerald-50 to-teal-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <Trees className="h-12 w-12 text-emerald-600 mx-auto mb-4" />
@@ -135,9 +135,9 @@ const Home: React.FC = () => {
               </p>
             </div>
             
-            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow border-l-4 border-blue-500">
-              <div className="rounded-full bg-blue-100 p-4 w-16 h-16 flex items-center justify-center mb-6 mx-auto">
-                <Shield className="h-8 w-8 text-blue-600" />
+            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow border-l-4 border-teal-500">
+              <div className="rounded-full bg-teal-100 p-4 w-16 h-16 flex items-center justify-center mb-6 mx-auto">
+                <Shield className="h-8 w-8 text-teal-600" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-stone-800 text-center">Viajá con confianza</h3>
               <p className="text-stone-600 text-center leading-relaxed">
@@ -146,9 +146,9 @@ const Home: React.FC = () => {
               </p>
             </div>
             
-            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow border-l-4 border-teal-500">
-              <div className="rounded-full bg-teal-100 p-4 w-16 h-16 flex items-center justify-center mb-6 mx-auto">
-                <Clock className="h-8 w-8 text-teal-600" />
+            <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow border-l-4 border-lime-500">
+              <div className="rounded-full bg-lime-100 p-4 w-16 h-16 flex items-center justify-center mb-6 mx-auto">
+                <Clock className="h-8 w-8 text-lime-600" />
               </div>
               <h3 className="text-xl font-bold mb-4 text-stone-800 text-center">Flexible y conveniente</h3>
               <p className="text-stone-600 text-center leading-relaxed">
@@ -160,8 +160,8 @@ const Home: React.FC = () => {
         </div>
       </section>
       
-      {/* How it Works Section - Azul oscuro */}
-      <section className="py-16 bg-gradient-to-r from-blue-900 via-teal-800 to-blue-900 text-emerald-50">
+      {/* How it Works Section - Verde oscuro */}
+      <section className="py-16 bg-gradient-to-r from-emerald-800 via-teal-700 to-emerald-800 text-emerald-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
@@ -173,7 +173,7 @@ const Home: React.FC = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center bg-teal-800 p-8 rounded-xl border-2 border-emerald-500">
+            <div className="text-center bg-emerald-700 p-8 rounded-xl border-2 border-emerald-500">
               <div className="bg-emerald-500 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">
                 1
               </div>
@@ -184,23 +184,23 @@ const Home: React.FC = () => {
               </p>
             </div>
             
-            <div className="text-center bg-blue-800 p-8 rounded-xl border-2 border-blue-400">
-              <div className="bg-blue-500 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">
+            <div className="text-center bg-teal-700 p-8 rounded-xl border-2 border-teal-500">
+              <div className="bg-teal-500 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">
                 2
               </div>
-              <h3 className="text-xl font-bold mb-4 text-blue-100">Reservá tu lugar</h3>
-              <p className="text-blue-200 leading-relaxed">
+              <h3 className="text-xl font-bold mb-4 text-teal-100">Reservá tu lugar</h3>
+              <p className="text-teal-200 leading-relaxed">
                 Elegí un viaje que te convenga y reservá tu asiento. 
                 Coordiná los detalles con el conductor.
               </p>
             </div>
             
-            <div className="text-center bg-teal-800 p-8 rounded-xl border-2 border-teal-400">
-              <div className="bg-teal-500 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">
+            <div className="text-center bg-lime-700 p-8 rounded-xl border-2 border-lime-500">
+              <div className="bg-lime-500 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">
                 3
               </div>
-              <h3 className="text-xl font-bold mb-4 text-teal-100">¡Disfrutá el viaje!</h3>
-              <p className="text-teal-200 leading-relaxed">
+              <h3 className="text-xl font-bold mb-4 text-lime-100">¡Disfrutá el viaje!</h3>
+              <p className="text-lime-200 leading-relaxed">
                 Compartí la ruta, los gastos y quizás hagás nuevos amigos 
                 en el camino.
               </p>
@@ -210,7 +210,7 @@ const Home: React.FC = () => {
       </section>
       
       {/* CTA Section - Verde vibrante */}
-      <section className="py-16 bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-600 text-white">
+      <section className="py-16 bg-gradient-to-r from-emerald-600 via-teal-500 to-lime-600 text-white">
         <div className="container mx-auto px-4 text-center">
           <Mountain className="h-16 w-16 mx-auto mb-6 text-emerald-100" />
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
@@ -244,7 +244,7 @@ const Home: React.FC = () => {
       </section>
       
       {/* Testimonials Section - Verde claro */}
-      <section className="py-16 bg-gradient-to-b from-emerald-50 to-blue-50">
+      <section className="py-16 bg-gradient-to-b from-emerald-50 to-teal-50">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 text-stone-800">
             Lo que dicen nuestros viajeros
@@ -276,19 +276,19 @@ const Home: React.FC = () => {
               </p>
             </div>
             
-            <div className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-blue-500">
+            <div className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-teal-500">
               <div className="flex items-center mb-6">
                 <img 
                   src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150" 
                   alt="Testimonio de Martín" 
-                  className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-blue-500"
+                  className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-teal-500"
                 />
                 <div>
                   <h4 className="font-bold text-stone-800">Martín P.</h4>
                   <p className="text-sm text-stone-600">San Martín de los Andes</p>
                   <div className="flex mt-1">
                     {[...Array(5)].map((_, i) => (
-                      <svg key={i} className="w-4 h-4 text-blue-500 fill-current" viewBox="0 0 24 24">
+                      <svg key={i} className="w-4 h-4 text-teal-500 fill-current" viewBox="0 0 24 24">
                         <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                       </svg>
                     ))}
@@ -301,19 +301,19 @@ const Home: React.FC = () => {
               </p>
             </div>
             
-            <div className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-teal-500">
+            <div className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-lime-500">
               <div className="flex items-center mb-6">
                 <img 
                   src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150" 
                   alt="Testimonio de Carolina" 
-                  className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-teal-500"
+                  className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-lime-500"
                 />
                 <div>
                   <h4 className="font-bold text-stone-800">Carolina G.</h4>
                   <p className="text-sm text-stone-600">Junín de los Andes</p>
                   <div className="flex mt-1">
                     {[...Array(4)].map((_, i) => (
-                      <svg key={i} className="w-4 h-4 text-teal-500 fill-current" viewBox="0 0 24 24">
+                      <svg key={i} className="w-4 h-4 text-lime-500 fill-current" viewBox="0 0 24 24">
                         <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                       </svg>
                     ))}

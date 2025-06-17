@@ -58,7 +58,7 @@ const TripFilter: React.FC<TripFilterProps> = ({ onFilter }) => {
             placeholder="¿A dónde vas?"
             value={destination}
             onChange={(e) => setDestination(e.target.value)}
-            leftIcon={<MapPin className="h-5 w-5 text-blue-500" />}
+            leftIcon={<MapPin className="h-5 w-5 text-teal-500" />}
           />
           
           <Input
@@ -66,7 +66,7 @@ const TripFilter: React.FC<TripFilterProps> = ({ onFilter }) => {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            leftIcon={<Calendar className="h-5 w-5 text-teal-500" />}
+            leftIcon={<Calendar className="h-5 w-5 text-lime-500" />}
           />
           
           <Input
@@ -86,7 +86,7 @@ const TripFilter: React.FC<TripFilterProps> = ({ onFilter }) => {
             placeholder="Precio máximo"
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
-            leftIcon={<DollarSign className="h-5 w-5 text-blue-500" />}
+            leftIcon={<DollarSign className="h-5 w-5 text-teal-500" />}
           />
         </div>
         

@@ -23,7 +23,7 @@ const TripCard: React.FC<TripCardProps> = ({
     if (!isReserved) return null;
 
     const badgeStyles = {
-      pending: 'bg-blue-100 text-blue-800',
+      pending: 'bg-teal-100 text-teal-800',
       confirmed: 'bg-emerald-100 text-emerald-800',
       rejected: 'bg-red-100 text-red-800',
       cancelled: 'bg-gray-100 text-gray-800',
@@ -84,12 +84,12 @@ const TripCard: React.FC<TripCardProps> = ({
             </div>
 
             <div className="flex items-center text-sm text-gray-600">
-              <Clock className="h-4 w-4 text-blue-500 mr-1" />
+              <Clock className="h-4 w-4 text-teal-500 mr-1" />
               <span>{trip.departureTime}</span>
             </div>
 
             <div className="flex items-center text-sm text-gray-600">
-              <Users className="h-4 w-4 text-teal-500 mr-1" />
+              <Users className="h-4 w-4 text-lime-500 mr-1" />
               <span>
                 {trip.availableSeats}{' '}
                 {trip.availableSeats === 1 ? 'asiento' : 'asientos'}
@@ -104,7 +104,7 @@ const TripCard: React.FC<TripCardProps> = ({
 
           {trip.carModel && (
             <div className="flex items-center text-sm text-gray-600 mt-1">
-              <Car className="h-4 w-4 text-blue-500 mr-1" />
+              <Car className="h-4 w-4 text-teal-500 mr-1" />
               <span>
                 {trip.carModel} • {trip.carColor}
               </span>
@@ -119,7 +119,7 @@ const TripCard: React.FC<TripCardProps> = ({
               </div>
               <span className="text-gray-400">→</span>
               <div className="flex items-center text-sm">
-                <MapPin className="h-4 w-4 text-blue-500 mr-1" />
+                <MapPin className="h-4 w-4 text-teal-500 mr-1" />
                 <span className="text-gray-600">{trip.destination}</span>
               </div>
             </div>
