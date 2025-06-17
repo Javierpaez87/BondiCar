@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Navigate, useSearchParams, Link } from 'react-router-dom';
 import { Car, Bookmark, User } from 'lucide-react';
 import Layout from '../components/layout/Layout';
@@ -18,10 +18,13 @@ const Dashboard: React.FC = () => {
     fetchMyTrips,
     fetchMyBookings,
     fetchBookingsForMyTrips,
+    setHasNewBookings,
+    hasNewBookings,
   } = useTripStore();
 
   const [activeTab, setActiveTab] = useState<'trips' | 'bookings' | 'received' | 'profile'>('trips');
   const [searchParams] = useSearchParams();
+  const prevBookingCountRef = useRef(0);
 
   useEffect(() => {
     const tabParam = searchParams.get('tab');
@@ -39,9 +42,24 @@ const Dashboard: React.FC = () => {
     if (isAuthenticated) {
       fetchMyTrips();
       fetchMyBookings();
-      fetchBookingsForMyTrips();
+      fetchBookingsForMyTrips().then(() => {
+        const newCount = myBookings.length;
+        const prevCount = prevBookingCountRef.current;
+
+        if (newCount > prevCount) {
+          setHasNewBookings(true);
+        }
+
+        prevBookingCountRef.current = newCount;
+      });
     }
-  }, [isAuthenticated, fetchMyTrips, fetchMyBookings, fetchBookingsForMyTrips]);
+  }, [isAuthenticated, fetchMyTrips, fetchMyBookings, fetchBookingsForMyTrips, myBookings.length, setHasNewBookings]);
+
+  useEffect(() => {
+    if (activeTab === 'received') {
+      setHasNewBookings(false);
+    }
+  }, [activeTab, setHasNewBookings]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
