@@ -334,3 +334,4 @@
     </div>
   </div>
 </footer>
+export default Home;
