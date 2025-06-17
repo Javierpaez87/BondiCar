@@ -1,10 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { User } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 import { useAuthStore } from '../store/authStore';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 const Profile: React.FC = () => {
   const { user } = useAuthStore();
+  const [profileData, setProfileData] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const uid = getAuth().currentUser?.uid;
+      if (!uid) return;
+
+      const userRef = doc(getFirestore(), 'users', uid);
+      const snapshot = await getDoc(userRef);
+      if (snapshot.exists()) {
+        setProfileData(snapshot.data());
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   return (
     <Layout>
@@ -26,7 +44,7 @@ const Profile: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Nombre</h3>
-                <p className="text-base text-gray-900">{user?.name}</p>
+                <p className="text-base text-gray-900">{user?.name || 'Sin nombre'}</p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Correo electrónico</h3>
@@ -34,7 +52,7 @@ const Profile: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Teléfono</h3>
-                <p className="text-base text-gray-900">{user?.phone}</p>
+                <p className="text-base text-gray-900">{profileData?.phone || 'No cargado'}</p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Miembro desde</h3>
