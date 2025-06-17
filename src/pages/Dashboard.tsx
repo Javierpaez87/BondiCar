@@ -1,3 +1,6 @@
+// Este archivo contiene la lógica completa del dashboard con control de pestañas,
+// y ahora también con manejo de errores si una reserva no tiene viaje asociado.
+
 import React, { useEffect, useState } from 'react';
 import { Navigate, useSearchParams, Link } from 'react-router-dom';
 import { Car, Bookmark, User } from 'lucide-react';
@@ -157,14 +160,27 @@ const Dashboard: React.FC = () => {
                   </h2>
                   {Array.isArray(myBookings) && myBookings.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {myBookings.map((booking) => (
-                        <TripCard
-                          key={booking.id}
-                          trip={booking.trip}
-                          isReserved={true}
-                          reservationStatus={getReservationStatus(booking)}
-                        />
-                      ))}
+                      {myBookings.map((booking) => {
+                        if (!booking.trip) {
+                          return (
+                            <div
+                              key={booking.id}
+                              className="p-4 bg-yellow-100 text-yellow-800 rounded shadow"
+                            >
+                              Esta reserva no tiene un viaje asociado.
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <TripCard
+                            key={booking.id}
+                            trip={booking.trip}
+                            isReserved={true}
+                            reservationStatus={getReservationStatus(booking)}
+                          />
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="bg-white rounded-lg shadow-card p-8 text-center">
