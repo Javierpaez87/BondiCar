@@ -1,282 +1,102 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Navigate, useSearchParams, Link } from 'react-router-dom';
-import { Car, Bookmark, User } from 'lucide-react';
-import Layout from '../components/layout/Layout';
-import TripCard from '../components/trip/TripCard';
-import PendingBookings from '../components/PendingBookings';
-import { useTripStore } from '../store/tripStore';
-import { useAuthStore } from '../store/authStore';
+import React from 'react';
+import {
+  getFirestore,
+  updateDoc,
+  doc,
+  getDoc,
+} from 'firebase/firestore';
 import { Booking } from '../types';
 
-const Dashboard: React.FC = () => {
-  const { isAuthenticated, user } = useAuthStore();
-  const {
-    myTrips,
-    myBookings,
-    isLoading,
-    error,
-    fetchMyTrips,
-    fetchMyBookings,
-    fetchBookingsForMyTrips,
-    setHasNewBookings,
-    hasNewBookings,
-  } = useTripStore();
+interface Props {
+  bookings: Booking[];
+}
 
-  const [activeTab, setActiveTab] = useState<'trips' | 'bookings' | 'received' | 'profile'>('trips');
-  const [searchParams] = useSearchParams();
-  const prevBookingCountRef = useRef(0);
+const ReceivedBookings: React.FC<Props> = ({ bookings }) => {
+  const updateBookingStatus = async (
+    bookingId: string,
+    status: 'accepted' | 'rejected'
+  ) => {
+    const db = getFirestore();
 
-  useEffect(() => {
-    const tabParam = searchParams.get('tab');
-    if (
-      tabParam === 'trips' ||
-      tabParam === 'bookings' ||
-      tabParam === 'received' ||
-      tabParam === 'profile'
-    ) {
-      setActiveTab(tabParam);
+    // Obtener la reserva
+    const bookingRef = doc(db, 'Bookings', bookingId);
+    const bookingSnap = await getDoc(bookingRef);
+
+    if (!bookingSnap.exists()) return;
+
+    const bookingData = bookingSnap.data();
+    const { tripId, seats } = bookingData;
+
+    // Si se acepta la reserva, actualizar asientos del viaje
+    if (status === 'accepted') {
+      const tripRef = doc(db, 'Post Trips', tripId);
+      const tripSnap = await getDoc(tripRef);
+
+      if (tripSnap.exists()) {
+        const tripData = tripSnap.data();
+        const currentSeats = tripData?.availableSeats ?? 0;
+        const updatedSeats = currentSeats - seats;
+
+        await updateDoc(tripRef, {
+          availableSeats: updatedSeats > 0 ? updatedSeats : 0,
+        });
+      }
     }
-  }, [searchParams]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchMyTrips();
-      fetchMyBookings();
-      fetchBookingsForMyTrips().then(() => {
-        const newCount = myBookings.length;
-        const prevCount = prevBookingCountRef.current;
+    // Actualizar el estado de la reserva
+    await updateDoc(bookingRef, { status });
 
-        if (newCount > prevCount) {
-          setHasNewBookings(true);
-        }
-
-        prevBookingCountRef.current = newCount;
-      });
-    }
-  }, [isAuthenticated, fetchMyTrips, fetchMyBookings, fetchBookingsForMyTrips, myBookings.length, setHasNewBookings]);
-
-  useEffect(() => {
-    if (activeTab === 'received') {
-      setHasNewBookings(false);
-    }
-  }, [activeTab, setHasNewBookings]);
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
-  }
-
-  const getReservationStatus = (booking: Booking) => booking.status;
+    alert(`Reserva ${status === 'accepted' ? 'aceptada' : 'rechazada'} correctamente.`);
+    // ⚠️ Si querés refrescar desde el padre, se debe llamar a fetchMyTrips()
+  };
 
   return (
-    <Layout>
-      <div className="bg-gray-50 py-8 min-h-screen">
-        <div className="container mx-auto px-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Mi Panel</h1>
+    <div className="p-4 bg-white rounded shadow-md">
+      <h2 className="text-xl font-semibold mb-4">Reservas recibidas</h2>
 
-          {/* Tabs */}
-          <div className="mb-8">
-            <div className="border-b border-gray-200">
-              <nav className="flex space-x-8 overflow-x-auto">
-                <button
-                  onClick={() => setActiveTab('trips')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === 'trips'
-                      ? 'border-primary-500 text-primary-500'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  <Car className="inline-block h-5 w-5 mr-2" />
-                  Mis Viajes Publicados
-                </button>
-                <button
-                  onClick={() => setActiveTab('bookings')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === 'bookings'
-                      ? 'border-primary-500 text-primary-500'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  <Bookmark className="inline-block h-5 w-5 mr-2" />
-                  Mis Reservas
-                </button>
-                <button
-                  onClick={() => setActiveTab('received')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === 'received'
-                      ? 'border-primary-500 text-primary-500'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  <Bookmark className="inline-block h-5 w-5 mr-2" />
-                  Reservas Recibidas
-                </button>
-                <button
-                  onClick={() => setActiveTab('profile')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === 'profile'
-                      ? 'border-primary-500 text-primary-500'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  <User className="inline-block h-5 w-5 mr-2" />
-                  Mi Perfil
-                </button>
-              </nav>
-            </div>
-          </div>
+      {bookings.length === 0 ? (
+        <p>No hay reservas.</p>
+      ) : (
+        <ul className="space-y-4">
+          {bookings.map((booking) => (
+            <li
+              key={booking.id}
+              className="p-4 border rounded flex justify-between items-center bg-gray-50"
+            >
+              <div>
+                <p><strong>Pasajero:</strong> {booking.passengerInfo?.name || 'No disponible'}</p>
+                <p><strong>Teléfono:</strong> {booking.passengerInfo?.phone || 'No disponible'}</p>
+                <p><strong>Asientos solicitados:</strong> {booking.seats}</p>
+                <p>
+                  <strong>Estado:</strong>{' '}
+                  {booking.status === 'pending' && '⏳ Pendiente'}
+                  {booking.status === 'accepted' && '✅ Aceptada'}
+                  {booking.status === 'rejected' && '❌ Rechazada'}
+                </p>
+              </div>
 
-          {error && (
-            <div className="p-4 bg-red-50 text-red-700 rounded-lg mb-6">{error}</div>
-          )}
-
-          {isLoading ? (
-            <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
-            </div>
-          ) : (
-            <>
-              {activeTab === 'trips' && (
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                    Viajes que has publicado
-                  </h2>
-                  {myTrips.filter((trip) => trip.availableSeats > 0).length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {myTrips
-                        .filter((trip) => trip.availableSeats > 0)
-                        .map((trip) => (
-                          <TripCard key={trip.id} trip={trip} />
-                        ))}
-                    </div>
-                  ) : (
-                    <div className="bg-white rounded-lg shadow-card p-8 text-center">
-                      <Car className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        No tienes viajes activos
-                      </h3>
-                      <p className="text-gray-600 mb-4">
-                        Publicá un nuevo viaje para conectar con pasajeros.
-                      </p>
-                      <Link
-                        to="/create-trip"
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-500 hover:bg-primary-600"
-                      >
-                        Publicar un Viaje
-                      </Link>
-                    </div>
-                  )}
+              {booking.status === 'pending' && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => updateBookingStatus(booking.id, 'accepted')}
+                    className="bg-green-600 text-white px-3 py-1 rounded"
+                  >
+                    Aceptar
+                  </button>
+                  <button
+                    onClick={() => updateBookingStatus(booking.id, 'rejected')}
+                    className="bg-red-500 text-white px-3 py-1 rounded"
+                  >
+                    Rechazar
+                  </button>
                 </div>
               )}
-
-              {activeTab === 'bookings' && (
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                    Viajes que has reservado
-                  </h2>
-                  {Array.isArray(myBookings) && myBookings.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {myBookings.map((booking) => (
-                        <TripCard
-                          key={booking.id}
-                          trip={booking.trip}
-                          isReserved={true}
-                          reservationStatus={getReservationStatus(booking)}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="bg-white rounded-lg shadow-card p-8 text-center">
-                      <Bookmark className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        No has reservado ningún viaje
-                      </h3>
-                      <p className="text-gray-600 mb-4">
-                        Busca y reserva viajes para comenzar a disfrutar de los beneficios de viajar compartido.
-                      </p>
-                      <Link
-                        to="/search"
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-500 hover:bg-primary-600"
-                      >
-                        Buscar Viajes
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {activeTab === 'received' && (
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                    Reservas que recibiste como conductor
-                  </h2>
-                  <PendingBookings bookings={myBookings} />
-                </div>
-              )}
-
-              {activeTab === 'profile' && (
-                <div className="bg-white rounded-lg shadow-card p-6">
-                  <div className="flex flex-col md:flex-row">
-                    <div className="md:w-1/3 flex justify-center mb-6 md:mb-0">
-                      <div className="h-32 w-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-                        {user?.profilePicture ? (
-                          <img
-                            src={user.profilePicture}
-                            alt={user.name}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <User className="h-16 w-16 text-gray-400" />
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="md:w-2/3">
-                      <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                        Información Personal
-                      </h2>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-500">Nombre</h3>
-                          <p className="text-base text-gray-900">{user?.name}</p>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-500">Correo electrónico</h3>
-                          <p className="text-base text-gray-900">{user?.email}</p>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-500">Teléfono</h3>
-                          <p className="text-base text-gray-900">{user?.phone}</p>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-500">Miembro desde</h3>
-                          <p className="text-base text-gray-900">
-                            {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="mt-6">
-                        <Link
-                          to="/profile/edit"
-                          className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                        >
-                          Editar Perfil
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </div>
-    </Layout>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 };
 
-export default Dashboard;
+export default ReceivedBookings;
