@@ -13,6 +13,7 @@ const Dashboard: React.FC = () => {
   const {
     myTrips,
     myBookings,
+    bookingsForMyTrips,
     isLoading,
     error,
     fetchMyTrips,
@@ -43,7 +44,7 @@ const Dashboard: React.FC = () => {
       fetchMyTrips();
       fetchMyBookings();
       fetchBookingsForMyTrips().then(() => {
-        const newCount = myBookings.length;
+        const newCount = bookingsForMyTrips.length;
         const prevCount = prevBookingCountRef.current;
 
         if (newCount > prevCount) {
@@ -53,7 +54,7 @@ const Dashboard: React.FC = () => {
         prevBookingCountRef.current = newCount;
       });
     }
-  }, [isAuthenticated, fetchMyTrips, fetchMyBookings, fetchBookingsForMyTrips, myBookings.length, setHasNewBookings]);
+  }, [isAuthenticated, fetchMyTrips, fetchMyBookings, fetchBookingsForMyTrips, bookingsForMyTrips.length, setHasNewBookings]);
 
   useEffect(() => {
     if (activeTab === 'received') {
@@ -209,7 +210,7 @@ const Dashboard: React.FC = () => {
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">
                     Reservas que recibiste como conductor
                   </h2>
-                  <PendingBookings bookings={myBookings} />
+                  <PendingBookings bookings={bookingsForMyTrips} />
                 </div>
               )}
 
