@@ -39,6 +39,9 @@ export const useTripStore = create<TripState>((set, get) => ({
   isLoading: false,
   error: null,
 
+  hasNewBookings: false,
+  setHasNewBookings: (value) => set({ hasNewBookings: value }),
+
   createTrip: async (tripData) => {
     set({ isLoading: true, error: null });
     try {
