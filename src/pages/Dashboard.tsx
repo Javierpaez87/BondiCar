@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Navigate, useSearchParams, Link } from 'react-router-dom';
 import { Car, Bookmark, User } from 'lucide-react';
@@ -39,8 +38,8 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated) {
       fetchMyTrips();
-      fetchMyBookings(); // ✅ Aseguramos que se cargan las reservas hechas como pasajero
-      fetchBookingsForMyTrips(); // ✅ Carga reservas recibidas como conductor
+      fetchMyBookings();
+      fetchBookingsForMyTrips();
     }
   }, [isAuthenticated, fetchMyTrips, fetchMyBookings, fetchBookingsForMyTrips]);
 
@@ -56,7 +55,7 @@ const Dashboard: React.FC = () => {
         <div className="container mx-auto px-4">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Mi Panel</h1>
 
-          {/* Navegación por Tabs */}
+          {/* Tabs */}
           <div className="mb-8">
             <div className="border-b border-gray-200">
               <nav className="flex space-x-8 overflow-x-auto">
@@ -140,12 +139,12 @@ const Dashboard: React.FC = () => {
                       <p className="text-gray-600 mb-4">
                         Publicá un nuevo viaje para conectar con pasajeros.
                       </p>
-                      <a
-                        href="/create-trip"
+                      <Link
+                        to="/create-trip"
                         className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-500 hover:bg-primary-600"
                       >
                         Publicar un Viaje
-                      </a>
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -156,7 +155,7 @@ const Dashboard: React.FC = () => {
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">
                     Viajes que has reservado
                   </h2>
-{Array.isArray(myBookings) && myBookings.length > 0 ? (
+                  {Array.isArray(myBookings) && myBookings.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {myBookings.map((booking) => (
                         <TripCard
@@ -176,12 +175,12 @@ const Dashboard: React.FC = () => {
                       <p className="text-gray-600 mb-4">
                         Busca y reserva viajes para comenzar a disfrutar de los beneficios de viajar compartido.
                       </p>
-                      <a
-                        href="/search"
+                      <Link
+                        to="/search"
                         className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-500 hover:bg-primary-600"
                       >
                         Buscar Viajes
-                      </a>
+                      </Link>
                     </div>
                   )}
                 </div>
