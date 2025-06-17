@@ -1,16 +1,24 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Car, Menu, X, LogOut, User as UserIcon } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { useTripStore } from '../../store/tripStore';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { hasNewBookings, setHasNewBookings } = useTripStore();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
   const isActive = (path: string) => location.pathname === path;
+
+  const handleNotificationClick = () => {
+    setHasNewBookings(false);
+    navigate('/dashboard?tab=received');
+  };
 
   return (
     <header className="bg-gradient-to-r from-stone-800 via-stone-700 to-stone-800 sticky top-0 z-50 shadow-lg border-b-2 border-emerald-500">
@@ -57,7 +65,7 @@ const Header: React.FC = () => {
                 Publicar Viaje
               </Link>
               <div className="relative group">
-                <button className="flex items-center space-x-2">
+                <button className="flex items-center space-x-2 relative">
                   <div className="h-8 w-8 rounded-full bg-stone-600 flex items-center justify-center overflow-hidden border-2 border-emerald-500">
                     {user?.profilePicture ? (
                       <img src={user.profilePicture} alt={user.name} className="h-full w-full object-cover" />
@@ -65,6 +73,16 @@ const Header: React.FC = () => {
                       <UserIcon className="h-5 w-5 text-emerald-400" />
                     )}
                   </div>
+
+                  {hasNewBookings && (
+                    <div
+                      onClick={handleNotificationClick}
+                      className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] px-2 py-[2px] rounded-full cursor-pointer z-20 shadow-lg hover:bg-red-500 transition-all"
+                      title="Tienes una nueva reserva"
+                    >
+                      1 reserva
+                    </div>
+                  )}
                 </button>
                 <div className="absolute right-0 mt-2 w-48 bg-stone-800 rounded-lg shadow-lg py-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 border border-emerald-500">
                   <Link to="/search" className="flex items-center px-4 py-2 text-sm text-stone-200 hover:bg-stone-700">
