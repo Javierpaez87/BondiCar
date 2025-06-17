@@ -156,64 +156,62 @@ export const useTripStore = create<TripState>((set, get) => ({
   },
 
   fetchMyBookings: async () => {
-    set({ isLoading: true, error: null });
-    try {
-      const db = getFirestore();
-      const auth = getAuth();
-      const user = auth.currentUser;
-      if (!user) throw new Error('No estás autenticado');
+  set({ isLoading: true, error: null });
 
-      const q = query(collection(db, 'Bookings'), where('passengerId', '==', user.uid));
-      const snapshot = await getDocs(q);
+  try {
+    const db = getFirestore();
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) throw new Error('No estás autenticado');
 
-      const bookings: Booking[] = [];
+    const q = query(collection(db, 'Bookings'), where('passengerId', '==', user.uid));
+    const snapshot = await getDocs(q);
 
-      for (const doc of snapshot.docs) {
-        const data = doc.data() as DocumentData;
+    const bookings: Booking[] = [];
 
-        const tripSnap = await getDocs(
-          query(collection(db, 'Post Trips'), where('__name__', '==', data.tripId))
-        );
+    for (const docSnap of snapshot.docs) {
+      const data = docSnap.data() as DocumentData;
 
-        const tripDoc = tripSnap.docs[0];
-
-        if (!tripDoc) {
-          console.warn('⚠️ Trip no encontrado para reserva:', data.tripId);
-          continue;
-        }
-
-        const tripData = tripDoc.data();
-
-        const booking: Booking = {
-          id: doc.id,
-          ...data,
-          createdAt: data.createdAt?.toDate?.() || new Date(),
-          trip: {
-            id: tripDoc.id,
+      let trip = null;
+      if (data.tripId) {
+        const tripRef = doc(db, 'Post Trips', data.tripId);
+        const tripSnap = await getDoc(tripRef);
+        if (tripSnap.exists()) {
+          const tripData = tripSnap.data();
+          trip = {
+            id: tripSnap.id,
             ...tripData,
-            departureDate: tripData.departureDate?.toDate?.() || new Date(),
-            createdAt: tripData.createdAt?.toDate?.() || new Date(),
+            departureDate: tripData?.departureDate?.toDate?.() || new Date(),
+            createdAt: tripData?.createdAt?.toDate?.() || new Date(),
             driver: {
               ...tripData.driver,
               phone: tripData.driver?.phone || '',
               profilePicture: tripData.driver?.profilePicture || '',
             },
-          },
-        };
-
-        bookings.push(booking);
+          };
+        } else {
+          console.warn('⚠️ Trip no encontrado para reserva:', data.tripId);
+        }
       }
 
-      console.log('📦 fetchMyBookings:', bookings);
-      set({ myBookings: bookings, isLoading: false });
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'Error al obtener reservas',
-        isLoading: false,
+      bookings.push({
+        id: docSnap.id,
+        ...data,
+        createdAt: data.createdAt?.toDate?.() || new Date(),
+        trip,
       });
     }
-  },
 
+    console.log('📦 fetchMyBookings:', bookings);
+    set({ myBookings: bookings, isLoading: false });
+  } catch (error) {
+    console.error('❌ Error en fetchMyBookings:', error);
+    set({
+      error: error instanceof Error ? error.message : 'Error al obtener reservas',
+      isLoading: false,
+    });
+  }
+},
   fetchBookingsForMyTrips: async () => {
     set({ isLoading: true, error: null });
 
