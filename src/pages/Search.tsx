@@ -51,6 +51,18 @@ const Search: React.FC = () => {
       return;
     }
 
+    const user = useAuthStore.getState().user;
+
+    if (!user?.phone || user.phone.trim() === '') {
+      const confirmRedirect = window.confirm(
+        'Necesitás cargar un número de teléfono para poder reservar. ¿Querés ir a tu perfil ahora?'
+      );
+      if (confirmRedirect) {
+        window.location.href = '/profile/edit';
+      }
+      return;
+    }
+
     setSelectedTrip(trip);
   };
 
@@ -132,4 +144,3 @@ const Search: React.FC = () => {
 };
 
 export default Search;
-
