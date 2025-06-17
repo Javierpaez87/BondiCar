@@ -54,6 +54,13 @@ const ProfileEdit: React.FC = () => {
     const auth = getAuth();
     const ref = doc(db, 'users', user.id);
 
+    const telefonoValido = /^549\d{10}$/.test(phone);
+    if (!telefonoValido) {
+      alert('El teléfono debe comenzar con 549 y tener 13 dígitos (ej: 5491123456789)');
+      setLoading(false);
+      return;
+    }
+
     try {
       if (auth.currentUser && email !== auth.currentUser.email) {
         await updateEmail(auth.currentUser, email);
@@ -128,8 +135,12 @@ const ProfileEdit: React.FC = () => {
         <input
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="w-full border p-2 rounded mb-4"
+          placeholder="Ej: 5491123456789"
+          className="w-full border p-2 rounded mb-1"
         />
+        <p className="text-sm text-amber-600 mb-4">
+          ⚠️ Ingresá tu número incluyendo el código de país y sin espacios. Por esta via coordinaras los viajes junto a otros users.
+        </p>
 
         <label className="block mb-2 font-medium">Email</label>
         <input
