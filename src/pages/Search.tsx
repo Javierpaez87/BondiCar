@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import TripFilter from '../components/trip/TripFilter';
 import TripCard from '../components/trip/TripCard';
@@ -10,7 +10,8 @@ import { useAuthStore } from '../store/authStore';
 
 const Search: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const { isAuthenticated } = useAuthStore();
+  const navigate = useNavigate(); // ✅ nuevo hook
+  const { isAuthenticated, user } = useAuthStore();
   const {
     trips,
     filteredTrips,
@@ -36,7 +37,6 @@ const Search: React.FC = () => {
         origin: origin || undefined,
         destination: destination || undefined,
       };
-
       filterTrips(initialFilters);
     }
   }, [searchParams, filterTrips]);
@@ -47,18 +47,16 @@ const Search: React.FC = () => {
 
   const handleBookTrip = (trip: Trip) => {
     if (!isAuthenticated) {
-      window.location.href = '/login';
+      navigate('/login');
       return;
     }
-
-    const user = useAuthStore.getState().user;
 
     if (!user?.phone || user.phone.trim() === '') {
       const confirmRedirect = window.confirm(
         'Necesitás cargar un número de teléfono para poder reservar. ¿Querés ir a tu perfil ahora?'
       );
       if (confirmRedirect) {
-        window.location.href = '/profile/edit';
+        navigate('/profile/edit'); // ✅ redirección sin recarga
       }
       return;
     }
