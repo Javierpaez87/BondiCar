@@ -139,7 +139,7 @@ const ProfileEdit: React.FC = () => {
           className="w-full border p-2 rounded mb-1"
         />
         <p className="text-sm text-amber-600 mb-4">
-          ⚠️ Ingresá tu número incluyendo el código de país y sin espacios. Por esta via coordinaras los viajes junto a otros users.
+          ⚠️ Ingresá tu número incluyendo el código de país y sin espacios. Por esta via coordinaras los viajes junto a otros usuarios.
         </p>
 
         <label className="block mb-2 font-medium">Email</label>
