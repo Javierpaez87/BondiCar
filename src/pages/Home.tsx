@@ -277,30 +277,29 @@ const Home: React.FC = () => {
               </p>
             </div>
             
-            <div className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-teal-500">
-              <div className="flex items-center mb-6">
-                <img 
-                  src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150" 
-                  alt="Testimonio de Paz" 
-                  className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-teal-500"
-                />
-                <div>
-                  <h4 className="font-bold text-stone-800"> Paz R.</h4>
-                  <p className="text-sm text-stone-600">San Martín de los Andes</p>
-                  <div className="flex mt-1">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} className="w-4 h-4 text-teal-500 fill-current" viewBox="0 0 24 24">
-                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                      </svg>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <p className="text-stone-600 italic leading-relaxed">
-                "La app es súper fácil de usar. Lo que mas me gusta es poder reducir costos y hacer los viajes mas lindos conociendo gente!"
-              </p>
-            </div>
-            
+           <div className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-teal-500">
+  <div className="flex items-center mb-6">
+    <img 
+      src="/Paz R.png" 
+      alt="Testimonio de Paz" 
+      className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-teal-500"
+    />
+    <div>
+      <h4 className="font-bold text-stone-800">Paz R.</h4>
+      <p className="text-sm text-stone-600">San Martín de los Andes</p>
+      <div className="flex mt-1">
+        {[...Array(5)].map((_, i) => (
+          <svg key={i} className="w-4 h-4 text-teal-500 fill-current" viewBox="0 0 24 24">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+          </svg>
+        ))}
+      </div>
+    </div>
+  </div>
+  <p className="text-stone-600 italic leading-relaxed">
+    "La app es súper fácil de usar. Lo que más me gusta es poder reducir costos y hacer los viajes más lindos conociendo gente!"
+  </p>
+</div>            
             <div className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-lime-500">
               <div className="flex items-center mb-6">
                 <img 
