@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom'; // 👈 agregado useSearchParams
 import {
   getFirestore,
   doc,
@@ -20,6 +20,8 @@ import { useAuthStore } from '../store/authStore';
 
 const ProfileEdit: React.FC = () => {
   const { user, logout } = useAuthStore();
+  const [searchParams] = useSearchParams(); // 👈 obtiene parámetros de la URL
+  const from = searchParams.get('from');     // 👈 detecta si viene de "search"
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [email, setEmail] = useState(user?.email || '');
@@ -69,7 +71,7 @@ const ProfileEdit: React.FC = () => {
       await updateDoc(ref, { name, phone, email });
 
       alert('Perfil actualizado correctamente.');
-      navigate('/dashboard?tab=profile');
+      navigate(from === 'search' ? '/search' : '/dashboard?tab=profile'); // 👈 redirección condicional
     } catch (error: any) {
       if (error.code === 'auth/requires-recent-login') {
         try {
@@ -139,7 +141,7 @@ const ProfileEdit: React.FC = () => {
           className="w-full border p-2 rounded mb-1"
         />
         <p className="text-sm text-amber-600 mb-4">
-          ⚠️ Ingresá tu número incluyendo el código de país y sin espacios. Por esta via coordinaras los viajes junto a otros usuarios.
+          ⚠️ Ingresá tu número incluyendo el código de país y sin espacios. Por esta vía coordinarás los viajes junto a otros usuarios.
         </p>
 
         <label className="block mb-2 font-medium">Email</label>
