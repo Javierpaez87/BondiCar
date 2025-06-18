@@ -255,10 +255,10 @@ const Home: React.FC = () => {
   <div className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-emerald-500">
     <div className="flex items-center mb-6">
       <img 
-        src="/Agustin R.jpeg" 
-        alt="Testimonio de Agustín" 
-        className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-emerald-500"
-      />
+  src="/agustin-r.jpeg" 
+  alt="Testimonio de Agustín" 
+  className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-emerald-500"
+/>
       <div>
         <h4 className="font-bold text-stone-800">Agustín R.</h4>
         <p className="text-sm text-stone-600">Bariloche</p>
