@@ -68,10 +68,15 @@ const ProfileEdit: React.FC = () => {
         await updateEmail(auth.currentUser, email);
       }
 
-      await updateDoc(ref, { name, phone, email });
+     await updateDoc(ref, { name, phone, email });
 
-      alert('Perfil actualizado correctamente.');
-      navigate(from === 'search' ? '/search' : '/dashboard?tab=profile'); // 👈 redirección condicional
+// 👇 Actualiza el estado global con los nuevos datos
+useAuthStore.setState((state) => ({
+  user: { ...state.user!, name, phone, email },
+}));
+
+alert('Perfil actualizado correctamente.');
+navigate(from === 'search' ? '/search' : '/dashboard?tab=profile');
     } catch (error: any) {
       if (error.code === 'auth/requires-recent-login') {
         try {
