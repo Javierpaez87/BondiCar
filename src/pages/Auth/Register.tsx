@@ -25,14 +25,18 @@ const Register: React.FC = () => {
   }
   
   const onSubmit = async (data: RegisterFormData) => {
-    try {
-      await registerUser(data.name, data.email, data.phone, data.password);
-      navigate('/dashboard');
-    } catch (error) {
-      // Error is handled in the store
-    }
-  };
+  try {
+    const sanitizedName = data.name.trim();
+    const sanitizedEmail = data.email.trim();
+    const sanitizedPhone = data.phone.trim();
+    const sanitizedPassword = data.password.trim();
 
+    await registerUser(sanitizedName, sanitizedEmail, sanitizedPhone, sanitizedPassword);
+    navigate('/dashboard');
+  } catch (error) {
+    // Error is handled in the store
+  }
+};
   const handleGoogleRegister = async () => {
     try {
       await loginWithGoogle();
