@@ -281,11 +281,11 @@ const Home: React.FC = () => {
               <div className="flex items-center mb-6">
                 <img 
                   src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=150" 
-                  alt="Testimonio de Martín" 
+                  alt="Testimonio de Paz" 
                   className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-teal-500"
                 />
                 <div>
-                  <h4 className="font-bold text-stone-800">Martín P.</h4>
+                  <h4 className="font-bold text-stone-800"> Paz R.</h4>
                   <p className="text-sm text-stone-600">San Martín de los Andes</p>
                   <div className="flex mt-1">
                     {[...Array(5)].map((_, i) => (
@@ -297,8 +297,7 @@ const Home: React.FC = () => {
                 </div>
               </div>
               <p className="text-stone-600 italic leading-relaxed">
-                "Como conductor, me ayuda a cubrir los gastos de mis viajes 
-                frecuentes por la Ruta 40. La app es súper fácil de usar."
+                "La app es súper fácil de usar. Lo que mas me gusta es poder reducir costos y hacer los viajes mas lindos conociendo gente!"
               </p>
             </div>
             
