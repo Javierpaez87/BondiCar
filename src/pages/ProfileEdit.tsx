@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom'; // 👈 agregado useSearchParams
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   getFirestore,
   doc,
@@ -20,8 +20,8 @@ import { useAuthStore } from '../store/authStore';
 
 const ProfileEdit: React.FC = () => {
   const { user, logout } = useAuthStore();
-  const [searchParams] = useSearchParams(); // 👈 obtiene parámetros de la URL
-  const from = searchParams.get('from');     // 👈 detecta si viene de "search"
+  const [searchParams] = useSearchParams();
+  const from = searchParams.get('from');
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [email, setEmail] = useState(user?.email || '');
@@ -68,15 +68,15 @@ const ProfileEdit: React.FC = () => {
         await updateEmail(auth.currentUser, email);
       }
 
-     await updateDoc(ref, { name, phone, email });
+      await updateDoc(ref, { name, phone, email });
 
-// 👇 Actualiza el estado global con los nuevos datos
-useAuthStore.setState((state) => ({
-  user: { ...state.user!, name, phone, email },
-}));
+      // 🔄 Actualiza el estado del store
+      useAuthStore.setState((state) => ({
+        user: { ...state.user!, name, phone, email },
+      }));
 
-alert('Perfil actualizado correctamente.');
-navigate(from === 'search' ? '/search' : '/dashboard?tab=profile');
+      alert('Perfil actualizado correctamente.');
+      navigate(from === 'search' ? '/search' : '/dashboard?tab=profile');
     } catch (error: any) {
       if (error.code === 'auth/requires-recent-login') {
         try {
