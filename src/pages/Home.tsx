@@ -301,32 +301,32 @@ const Home: React.FC = () => {
   </p>
 </div>            
             <div className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-lime-500">
-              <div className="flex items-center mb-6">
-                <img 
-                  src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150" 
-                  alt="Testimonio de Javier" 
-                  className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-lime-500"
-                />
-                <div>
-                  <h4 className="font-bold text-stone-800">Javier P.</h4>
-                  <p className="text-sm text-stone-600">Junín de los Andes</p>
-                  <div className="flex mt-1">
-                    {[...Array(4)].map((_, i) => (
-                      <svg key={i} className="w-4 h-4 text-lime-500 fill-current" viewBox="0 0 24 24">
-                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                      </svg>
-                    ))}
-                    <svg className="w-4 h-4 text-stone-300 fill-current" viewBox="0 0 24 24">
-                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-              <p className="text-stone-600 italic leading-relaxed">
-                "Perfecta para los que vivimos en pueblos chicos y necesitamos 
-                viajar a las ciudades. ¡Una solución genial para la Patagonia!"
-              </p>
-            </div>
+  <div className="flex items-center mb-6">
+    <img 
+      src="/Javier P.jpeg" 
+      alt="Testimonio de Javier" 
+      className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-lime-500"
+    />
+    <div>
+      <h4 className="font-bold text-stone-800">Javier P.</h4>
+      <p className="text-sm text-stone-600">Junín de los Andes</p>
+      <div className="flex mt-1">
+        {[...Array(4)].map((_, i) => (
+          <svg key={i} className="w-4 h-4 text-lime-500 fill-current" viewBox="0 0 24 24">
+            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+          </svg>
+        ))}
+        <svg className="w-4 h-4 text-stone-300 fill-current" viewBox="0 0 24 24">
+          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+        </svg>
+      </div>
+    </div>
+  </div>
+  <p className="text-stone-600 italic leading-relaxed">
+    "Perfecta para los que vivimos en pueblos chicos y necesitamos 
+    viajar a las ciudades. ¡Una solución genial para la Patagonia!"
+  </p>
+</div>
           </div>
         </div>
       </section>
