@@ -63,34 +63,50 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   register: async (name, email, phone, password) => {
     set({ isLoading: true, error: null });
+
+    // ✅ Sanitización de entradas
+    const sanitizedEmail = email.trim();
+    const sanitizedPassword = password.trim();
+    const sanitizedName = name.trim();
+    const sanitizedPhone = phone.trim();
+
     try {
       const db = getFirestore();
-      const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, email, password);
 
-      await updateProfile(firebaseUser, { displayName: name });
+      // ✅ Debug: ver datos antes del fallo
+      console.log('Intentando registrar:', {
+        sanitizedEmail,
+        sanitizedPassword,
+        sanitizedName,
+        sanitizedPhone,
+      });
 
-      // ✅ Guardar perfil en Firestore
+      const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, sanitizedEmail, sanitizedPassword);
+
+      await updateProfile(firebaseUser, { displayName: sanitizedName });
+
       await setDoc(doc(db, 'users', firebaseUser.uid), {
-        name,
-        email,
-        phone,
+        name: sanitizedName,
+        email: sanitizedEmail,
+        phone: sanitizedPhone,
         createdAt: serverTimestamp(),
       });
 
       set({
         user: {
           id: firebaseUser.uid,
-          name,
+          name: sanitizedName,
           email: firebaseUser.email || '',
-          phone,
+          phone: sanitizedPhone,
           createdAt: new Date(firebaseUser.metadata.creationTime || Date.now()),
         },
         isAuthenticated: true,
         isLoading: false,
       });
     } catch (error: any) {
+      console.error('Error en Firebase:', error); // ✅ Ver más detalle
+
       let errorMessage = 'Error al registrarse';
-      
       if (error.code === 'auth/email-already-in-use') {
         errorMessage = 'Este email ya está registrado';
       } else if (error.code === 'auth/weak-password') {
@@ -98,7 +114,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       } else if (error.code === 'auth/invalid-email') {
         errorMessage = 'Email inválido';
       }
-      
+
       set({
         error: errorMessage,
         isLoading: false,
@@ -127,7 +143,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       const { user: firebaseUser } = await signInWithPopup(auth, provider);
       const db = getFirestore();
 
-      // ✅ Guardar perfil en Firestore si no existe
       await setDoc(doc(db, 'users', firebaseUser.uid), {
         name: firebaseUser.displayName || '',
         email: firebaseUser.email || '',
@@ -177,4 +192,3 @@ onAuthStateChanged(auth, (firebaseUser) => {
     });
   }
 });
-
