@@ -251,32 +251,32 @@ const Home: React.FC = () => {
             Lo que dicen nuestros viajeros
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-emerald-500">
-              <div className="flex items-center mb-6">
-                <img 
-                  src="https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=150" 
-                  alt="Testimonio de Laura" 
-                  className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-emerald-500"
-                />
-                <div>
-                  <h4 className="font-bold text-stone-800">Laura M.</h4>
-                  <p className="text-sm text-stone-600">Villa La Angostura</p>
-                  <div className="flex mt-1">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} className="w-4 h-4 text-emerald-500 fill-current" viewBox="0 0 24 24">
-                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                      </svg>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <p className="text-stone-600 italic leading-relaxed">
-                "Uso BondiCar para ir a trabajar a Bariloche. He conocido gente 
-                increíble y ahorro una fortuna en combustible. ¡Recomendadísimo!"
-              </p>
-            </div>
-            
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+  <div className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-emerald-500">
+    <div className="flex items-center mb-6">
+      <img 
+        src="/Agustin R.jpeg" 
+        alt="Testimonio de Agustín" 
+        className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-emerald-500"
+      />
+      <div>
+        <h4 className="font-bold text-stone-800">Agustín R.</h4>
+        <p className="text-sm text-stone-600">Bariloche</p>
+        <div className="flex mt-1">
+          {[...Array(5)].map((_, i) => (
+            <svg key={i} className="w-4 h-4 text-emerald-500 fill-current" viewBox="0 0 24 24">
+              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+            </svg>
+          ))}
+        </div>
+      </div>
+    </div>
+    <p className="text-stone-600 italic leading-relaxed">
+      "Uso BondiCar para ir a trabajar a Bariloche. He conocido gente 
+      increíble y ahorro una fortuna en combustible. ¡Recomendadísimo!"
+    </p>
+  </div>
+</div>            
            <div className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-teal-500">
   <div className="flex items-center mb-6">
     <img 
