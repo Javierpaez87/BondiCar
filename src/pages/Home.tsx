@@ -306,11 +306,11 @@ const Home: React.FC = () => {
               <div className="flex items-center mb-6">
                 <img 
                   src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150" 
-                  alt="Testimonio de Carolina" 
+                  alt="Testimonio de Javier" 
                   className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-lime-500"
                 />
                 <div>
-                  <h4 className="font-bold text-stone-800">Carolina G.</h4>
+                  <h4 className="font-bold text-stone-800">Javier P.</h4>
                   <p className="text-sm text-stone-600">Junín de los Andes</p>
                   <div className="flex mt-1">
                     {[...Array(4)].map((_, i) => (
