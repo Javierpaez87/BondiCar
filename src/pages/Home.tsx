@@ -214,7 +214,8 @@ const Home: React.FC = () => {
         <div className="container mx-auto px-4 text-center">
           <Mountain className="h-16 w-16 mx-auto mb-6 text-white/80 animate-float" />
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            ¿Vamos? Te llevo!
+            ¿Vamos? 
+            Te llevo!
           </h2>
           <p className="text-lg opacity-90 mb-8 max-w-2xl mx-auto">
             Únite a nuestra comunidad de viajeros patagónicos. Ahorrá dinero, 
