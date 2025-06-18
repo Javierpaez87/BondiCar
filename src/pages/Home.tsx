@@ -130,7 +130,7 @@ const Home: React.FC = () => {
                 </div>
               </div>
               <p className="text-stone-600 italic leading-relaxed">
-                "Uso BondiCar para ir a trabajar a Bariloche. He conocido gente increíble y ahorro una fortuna en combustible. ¡Recomendadísimo!"
+                "Uso BondiCar para moverme de Dina Huapi a Bari. He conocido gente increíble y ahorré una fortuna en combustible. ¡Recomendadísimo!"
               </p>
             </div>
 
