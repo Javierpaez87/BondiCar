@@ -101,16 +101,14 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* ...otras secciones aquí... */}
-
-      {/* Testimonials Section - Verde claro */}
-      <section className="py-16 bg-gradient-to-b from-emerald-50 to-teal-50">
+      {/* Testimonials Section actualizados */}
+      <section className="py-16 bg-gradient-to-b from-slate-50 to-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 text-stone-800">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 text-slate-800">
             Lo que dicen nuestros viajeros
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-emerald-500">
+            <div className="bg-white p-8 rounded-xl shadow-card border-l-4 border-emerald-500">
               <div className="flex items-center mb-6">
                 <img 
                   src="/agustin-r.jpeg" 
@@ -118,69 +116,69 @@ const Home: React.FC = () => {
                   className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-emerald-500"
                 />
                 <div>
-                  <h4 className="font-bold text-stone-800">Agustín R.</h4>
-                  <p className="text-sm text-stone-600">Bariloche</p>
+                  <h4 className="font-bold text-slate-800">Agustín R.</h4>
+                  <p className="text-sm text-slate-600">Bariloche</p>
                   <div className="flex mt-1">
                     {[...Array(5)].map((_, i) => (
-                      <svg key={i} className="w-4 h-4 text-emerald-500 fill-current" viewBox="0 0 24 24">
+                      <svg key={i} className="w-4 h-4 text-yellow-500 fill-current" viewBox="0 0 24 24">
                         <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                       </svg>
                     ))}
                   </div>
                 </div>
               </div>
-              <p className="text-stone-600 italic leading-relaxed">
+              <p className="text-slate-600 italic leading-relaxed">
                 "Uso BondiCar para moverme de Dina Huapi a Bari. He conocido gente increíble y ahorré una fortuna en combustible. ¡Recomendadísimo!"
               </p>
             </div>
 
-            <div className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-teal-500">
+            <div className="bg-white p-8 rounded-xl shadow-card border-l-4 border-emerald-500">
               <div className="flex items-center mb-6">
                 <img 
                   src="/Paz R.png" 
                   alt="Testimonio de Paz" 
-                  className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-teal-500"
+                  className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-emerald-500"
                 />
                 <div>
-                  <h4 className="font-bold text-stone-800">Paz R.</h4>
-                  <p className="text-sm text-stone-600">San Martín de los Andes</p>
+                  <h4 className="font-bold text-slate-800">Paz R.</h4>
+                  <p className="text-sm text-slate-600">San Martín de los Andes</p>
                   <div className="flex mt-1">
                     {[...Array(5)].map((_, i) => (
-                      <svg key={i} className="w-4 h-4 text-teal-500 fill-current" viewBox="0 0 24 24">
+                      <svg key={i} className="w-4 h-4 text-yellow-500 fill-current" viewBox="0 0 24 24">
                         <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                       </svg>
                     ))}
                   </div>
                 </div>
               </div>
-              <p className="text-stone-600 italic leading-relaxed">
+              <p className="text-slate-600 italic leading-relaxed">
                 "La app es súper fácil de usar. Lo que más me gusta es poder reducir costos y hacer los viajes más lindos conociendo gente!"
               </p>
             </div>
 
-            <div className="bg-white p-8 rounded-xl shadow-lg border-l-4 border-lime-500">
+            <div className="bg-white p-8 rounded-xl shadow-card border-l-4 border-emerald-500">
               <div className="flex items-center mb-6">
                 <img 
                   src="/Javier P.jpeg" 
                   alt="Testimonio de Javier" 
-                  className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-lime-500"
+                  className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-emerald-500"
                 />
                 <div>
-                  <h4 className="font-bold text-stone-800">Javier P.</h4>
-                  <p className="text-sm text-stone-600">Junín de los Andes</p>
+                  <h4 className="font-bold text-slate-800">Javier P.</h4>
+                  <p className="text-sm text-slate-600">Junín de los Andes</p>
                   <div className="flex mt-1">
                     {[...Array(4)].map((_, i) => (
-                      <svg key={i} className="w-4 h-4 text-lime-500 fill-current" viewBox="0 0 24 24">
+                      <svg key={i} className="w-4 h-4 text-yellow-500 fill-current" viewBox="0 0 24 24">
                         <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                       </svg>
                     ))}
-                    <svg className="w-4 h-4 text-stone-300 fill-current" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-slate-300 fill-current" viewBox="0 0 24 24">
                       <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                     </svg>
                   </div>
                 </div>
               </div>
-              <p className="text-stone-600 italic leading-relaxed">
+              <p className="text-slate-600 italic leading-relaxed">
                 "Perfecta para los que vivimos en pueblos chicos y necesitamos viajar a las ciudades. ¡Una solución genial para la Patagonia!"
               </p>
             </div>
