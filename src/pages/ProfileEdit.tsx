@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   getFirestore,
   doc,
@@ -20,6 +20,8 @@ import { useAuthStore } from '../store/authStore';
 
 const ProfileEdit: React.FC = () => {
   const { user, logout } = useAuthStore();
+  const [searchParams] = useSearchParams();
+  const from = searchParams.get('from');
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [email, setEmail] = useState(user?.email || '');
@@ -54,6 +56,13 @@ const ProfileEdit: React.FC = () => {
     const auth = getAuth();
     const ref = doc(db, 'users', user.id);
 
+    const telefonoValido = /^549\d{10}$/.test(phone);
+    if (!telefonoValido) {
+      alert('El teléfono debe comenzar con 549 y tener 13 dígitos (ej: 5491123456789)');
+      setLoading(false);
+      return;
+    }
+
     try {
       if (auth.currentUser && email !== auth.currentUser.email) {
         await updateEmail(auth.currentUser, email);
@@ -61,8 +70,13 @@ const ProfileEdit: React.FC = () => {
 
       await updateDoc(ref, { name, phone, email });
 
+      // 🔄 Actualiza el estado del store
+      useAuthStore.setState((state) => ({
+        user: { ...state.user!, name, phone, email },
+      }));
+
       alert('Perfil actualizado correctamente.');
-      navigate('/dashboard?tab=profile');
+      navigate(from === 'search' ? '/search' : '/dashboard?tab=profile');
     } catch (error: any) {
       if (error.code === 'auth/requires-recent-login') {
         try {
@@ -128,8 +142,12 @@ const ProfileEdit: React.FC = () => {
         <input
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="w-full border p-2 rounded mb-4"
+          placeholder="Ej: 5491123456789"
+          className="w-full border p-2 rounded mb-1"
         />
+        <p className="text-sm text-amber-600 mb-4">
+          ⚠️ Ingresá tu número incluyendo el código de país y sin espacios. Por esta vía coordinarás los viajes junto a otros usuarios.
+        </p>
 
         <label className="block mb-2 font-medium">Email</label>
         <input
