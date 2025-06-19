@@ -10,7 +10,7 @@ import { useAuthStore } from '../store/authStore';
 
 const Search: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate(); // ✅ nuevo hook
+  const navigate = useNavigate();
   const { isAuthenticated, user } = useAuthStore();
   const {
     trips,
@@ -29,8 +29,8 @@ const Search: React.FC = () => {
   }, [fetchTrips]);
 
   useEffect(() => {
-    const origin = searchParams.get('origin');
-    const destination = searchParams.get('destination');
+    const origin = searchParams.get('origin')?.toLowerCase().trim();
+    const destination = searchParams.get('destination')?.toLowerCase().trim();
 
     if (origin || destination) {
       const initialFilters: TripFilters = {
@@ -56,7 +56,7 @@ const Search: React.FC = () => {
         'Necesitás cargar un número de teléfono para poder reservar. ¿Querés ir a tu perfil ahora?'
       );
       if (confirmRedirect) {
-navigate('/profile/edit?from=search');
+        navigate('/profile/edit?from=search');
       }
       return;
     }
