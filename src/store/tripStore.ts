@@ -95,20 +95,24 @@ export const useTripStore = create<TripState>((set, get) => ({
     const today = new Date();
     today.setHours(0, 0, 0, 0); // 🔒 truncar hora
 
-    const q = query(
-      collection(db, 'Post Trips'),
-      where('departureDate', '>=', Timestamp.fromDate(today))
-    );
+    const allDocsSnapshot = await getDocs(collection(db, 'Post Trips'));
 
-    const snapshot = await getDocs(q);
-
-    const trips: Trip[] = snapshot.docs
+    const trips: Trip[] = allDocsSnapshot.docs
       .map((doc) => {
         const data = doc.data() as DocumentData;
+
+        // ❗️Validación segura para evitar errores
+        if (!data.departureDate || typeof data.departureDate.toDate !== 'function') {
+          return null;
+        }
+
+        const departureDate = data.departureDate.toDate();
+        if (departureDate < today) return null; // solo futuros
+
         return {
           id: doc.id,
           ...data,
-          departureDate: data.departureDate?.toDate?.() || new Date(),
+          departureDate,
           createdAt: data.createdAt?.toDate?.() || new Date(),
           driver: {
             ...data.driver,
@@ -117,7 +121,7 @@ export const useTripStore = create<TripState>((set, get) => ({
           },
         };
       })
-      .filter((trip) => trip.availableSeats > 0);
+      .filter((trip): trip is Trip => trip !== null && trip.availableSeats > 0);
 
     set({ trips, filteredTrips: trips, isLoading: false });
   } catch (error) {
@@ -127,6 +131,7 @@ export const useTripStore = create<TripState>((set, get) => ({
     });
   }
 },
+
 
   fetchMyTrips: async () => {
     set({ isLoading: true, error: null });

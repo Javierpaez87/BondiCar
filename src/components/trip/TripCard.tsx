@@ -9,6 +9,7 @@ interface TripCardProps {
   onBook?: (trip: Trip) => void;
   isReserved?: boolean;
   reservationStatus?: string;
+  hideConductorInfo?: boolean; // 👈 NUEVA PROP
 }
 
 const TripCard: React.FC<TripCardProps> = ({
@@ -16,6 +17,7 @@ const TripCard: React.FC<TripCardProps> = ({
   onBook,
   isReserved = false,
   reservationStatus,
+  hideConductorInfo = false, // 👈 DEFAULT FALSE
 }) => {
   const formattedDate = format(new Date(trip.departureDate), 'dd/MM/yyyy');
 
@@ -50,32 +52,36 @@ const TripCard: React.FC<TripCardProps> = ({
       {statusBadge()}
 
       <div className="flex items-start space-x-3">
-        <div className="flex-shrink-0">
-          <div className="h-12 w-12 rounded-full overflow-hidden">
-            {trip.driver.profilePicture ? (
-              <img
-                src={trip.driver.profilePicture}
-                alt={trip.driver.name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="h-full w-full bg-emerald-100 flex items-center justify-center">
-                <span className="text-emerald-600 font-medium">
-                  {trip.driver.name.substring(0, 2).toUpperCase()}
-                </span>
-              </div>
-            )}
+        {!hideConductorInfo && (
+          <div className="flex-shrink-0">
+            <div className="h-12 w-12 rounded-full overflow-hidden">
+              {trip.driver.profilePicture ? (
+                <img
+                  src={trip.driver.profilePicture}
+                  alt={trip.driver.name}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="h-full w-full bg-emerald-100 flex items-center justify-center">
+                  <span className="text-emerald-600 font-medium">
+                    {trip.driver.name.substring(0, 2).toUpperCase()}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex-1">
           <h3 className="font-semibold text-lg text-gray-900">
             {trip.origin} → {trip.destination}
           </h3>
 
-          <p className="text-sm text-gray-500 mt-1">
-            Conductor: {trip.driver.name}
-          </p>
+          {!hideConductorInfo && (
+            <p className="text-sm text-gray-500 mt-1">
+              Conductor: {trip.driver.name}
+            </p>
+          )}
 
           <div className="grid grid-cols-2 gap-2 mt-3">
             <div className="flex items-center text-sm text-gray-600">
@@ -111,52 +117,54 @@ const TripCard: React.FC<TripCardProps> = ({
             </div>
           )}
 
-          <div className="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
-            <div className="flex space-x-2">
-              <div className="flex items-center text-sm">
-                <MapPin className="h-4 w-4 text-emerald-500 mr-1" />
-                <span className="text-gray-600">{trip.origin}</span>
+          {!hideConductorInfo && (
+            <div className="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
+              <div className="flex space-x-2">
+                <div className="flex items-center text-sm">
+                  <MapPin className="h-4 w-4 text-emerald-500 mr-1" />
+                  <span className="text-gray-600">{trip.origin}</span>
+                </div>
+                <span className="text-gray-400">→</span>
+                <div className="flex items-center text-sm">
+                  <MapPin className="h-4 w-4 text-teal-500 mr-1" />
+                  <span className="text-gray-600">{trip.destination}</span>
+                </div>
               </div>
-              <span className="text-gray-400">→</span>
-              <div className="flex items-center text-sm">
-                <MapPin className="h-4 w-4 text-teal-500 mr-1" />
-                <span className="text-gray-600">{trip.destination}</span>
-              </div>
-            </div>
 
-            <div className="flex space-x-3">
-              {trip.driver.phone && (
-                <a
-                  href={`https://wa.me/${trip.driver.phone.replace(/\D/g, '')}?text=${encodeURIComponent(
-                    `Hola ${trip.driver.name}, vi tu viaje de ${trip.origin} a ${trip.destination} en BondiCar y me interesa reservar un lugar.`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600 transition"
-                >
-                  <svg
-                    className="w-4 h-4 mr-1"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
+              <div className="flex space-x-3">
+                {trip.driver.phone && (
+                  <a
+                    href={`https://wa.me/${trip.driver.phone.replace(/\D/g, '')}?text=${encodeURIComponent(
+                      `Hola ${trip.driver.name}, vi tu viaje de ${trip.origin} a ${trip.destination} en BondiCar y me interesa reservar un lugar.`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600 transition"
                   >
-                    <path d="M...Z" /> {/* Poné el path real de WhatsApp acá */}
-                  </svg>
-                  WhatsApp
-                </a>
-              )}
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M...Z" />
+                    </svg>
+                    WhatsApp
+                  </a>
+                )}
 
-              {!isReserved && onBook && (
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => onBook(trip)}
-                  className="bg-emerald-600 hover:bg-emerald-700"
-                >
-                  Reservar
-                </Button>
-              )}
+                {!isReserved && onBook && (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => onBook(trip)}
+                    className="bg-emerald-600 hover:bg-emerald-700"
+                  >
+                    Reservar
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
