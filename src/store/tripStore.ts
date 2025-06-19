@@ -89,36 +89,44 @@ export const useTripStore = create<TripState>((set, get) => ({
   },
 
   fetchTrips: async () => {
-    set({ isLoading: true, error: null });
-    try {
-      const db = getFirestore();
-      const snapshot = await getDocs(collection(db, 'Post Trips'));
+  set({ isLoading: true, error: null });
+  try {
+    const db = getFirestore();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // 🔒 truncar hora
 
-      const trips: Trip[] = snapshot.docs
-        .map((doc) => {
-          const data = doc.data() as DocumentData;
-          return {
-            id: doc.id,
-            ...data,
-            departureDate: data.departureDate?.toDate?.() || new Date(),
-            createdAt: data.createdAt?.toDate?.() || new Date(),
-            driver: {
-              ...data.driver,
-              phone: data.driver?.phone || '',
-              profilePicture: data.driver?.profilePicture || '',
-            },
-          };
-        })
-        .filter((trip) => trip.availableSeats > 0);
+    const q = query(
+      collection(db, 'Post Trips'),
+      where('departureDate', '>=', Timestamp.fromDate(today))
+    );
 
-      set({ trips, filteredTrips: trips, isLoading: false });
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'Error al obtener viajes',
-        isLoading: false,
-      });
-    }
-  },
+    const snapshot = await getDocs(q);
+
+    const trips: Trip[] = snapshot.docs
+      .map((doc) => {
+        const data = doc.data() as DocumentData;
+        return {
+          id: doc.id,
+          ...data,
+          departureDate: data.departureDate?.toDate?.() || new Date(),
+          createdAt: data.createdAt?.toDate?.() || new Date(),
+          driver: {
+            ...data.driver,
+            phone: data.driver?.phone || '',
+            profilePicture: data.driver?.profilePicture || '',
+          },
+        };
+      })
+      .filter((trip) => trip.availableSeats > 0);
+
+    set({ trips, filteredTrips: trips, isLoading: false });
+  } catch (error) {
+    set({
+      error: error instanceof Error ? error.message : 'Error al obtener viajes',
+      isLoading: false,
+    });
+  }
+},
 
   fetchMyTrips: async () => {
     set({ isLoading: true, error: null });
