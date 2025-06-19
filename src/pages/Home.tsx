@@ -155,7 +155,8 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
- {/* 🚗 Viajes recomendados */}
+
+      {/* 🚗 Viajes recomendados */}
       {recommendedTrips.length > 0 && (
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
@@ -178,6 +179,42 @@ const Home: React.FC = () => {
           </div>
         </section>
       )}
+
+      {/* CTA Section - Gradiente vibrante */}
+      <section className="py-16 bg-gradient-lake text-white">
+        <div className="container mx-auto px-4 text-center">
+          <Mountain className="h-16 w-16 mx-auto mb-6 text-white/80 animate-float" />
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+            ¿Vamos? 
+            Te llevo!
+          </h2>
+          <p className="text-lg opacity-90 mb-8 max-w-2xl mx-auto">
+            Únite a nuestra comunidad de viajeros patagónicos. Ahorrá dinero, 
+            conocé gente y cuidemos juntos nuestros hermosos paisajes.
+          </p>
+
+          <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <Button 
+              variant="secondary" 
+              size="lg"
+              onClick={() => navigate('/create-trip')}
+              className="bg-slate-800 hover:bg-slate-700 text-white border-slate-700 shadow-medium hover:shadow-strong transition-all duration-200"
+            >
+              Publicar un Viaje
+            </Button>
+
+            <Button 
+              variant="outline" 
+              size="lg"
+              className="border-white text-white hover:bg-white hover:text-primary-600 shadow-medium hover:shadow-strong transition-all duration-200"
+              onClick={() => navigate('/search')}
+            >
+              Buscar Viajes
+            </Button>
+          </div>
+        </div>
+      </section>
+      
       {/* Features Section - Fondo claro */}
       <section className="py-16 bg-gradient-to-b from-slate-50 to-slate-100">
         <div className="container mx-auto px-4">
@@ -272,41 +309,6 @@ const Home: React.FC = () => {
                 en el camino.
               </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section - Gradiente vibrante */}
-      <section className="py-16 bg-gradient-lake text-white">
-        <div className="container mx-auto px-4 text-center">
-          <Mountain className="h-16 w-16 mx-auto mb-6 text-white/80 animate-float" />
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            ¿Vamos? 
-            Te llevo!
-          </h2>
-          <p className="text-lg opacity-90 mb-8 max-w-2xl mx-auto">
-            Únite a nuestra comunidad de viajeros patagónicos. Ahorrá dinero, 
-            conocé gente y cuidemos juntos nuestros hermosos paisajes.
-          </p>
-
-          <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <Button 
-              variant="secondary" 
-              size="lg"
-              onClick={() => navigate('/create-trip')}
-              className="bg-slate-800 hover:bg-slate-700 text-white border-slate-700 shadow-medium hover:shadow-strong transition-all duration-200"
-            >
-              Publicar un Viaje
-            </Button>
-
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="border-white text-white hover:bg-white hover:text-primary-600 shadow-medium hover:shadow-strong transition-all duration-200"
-              onClick={() => navigate('/search')}
-            >
-              Buscar Viajes
-            </Button>
           </div>
         </div>
       </section>
