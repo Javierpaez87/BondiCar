@@ -21,20 +21,45 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     const fetchRecommendedTrips = async () => {
-      try {
-        const db = getFirestore();
-        const tripsRef = collection(db, 'Post Trips');
-        const q = query(tripsRef, orderBy('createdAt', 'desc'), limit(4));
-        const snapshot = await getDocs(q);
-        const trips: Trip[] = snapshot.docs.map((doc) => ({
+  try {
+    const db = getFirestore();
+    const tripsRef = collection(db, 'Post Trips');
+    const snapshot = await getDocs(tripsRef);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const trips: Trip[] = snapshot.docs
+      .map((doc) => {
+        const data = doc.data();
+        if (!data.departureDate || typeof data.departureDate.toDate !== 'function') {
+          return null;
+        }
+
+        const departureDate = data.departureDate.toDate();
+        if (departureDate < today) return null;
+
+        return {
           id: doc.id,
-          ...doc.data(),
-        })) as Trip[];
-        setRecommendedTrips(trips);
-      } catch (error) {
-        console.error('Error al traer viajes recomendados:', error);
-      }
-    };
+          ...data,
+          departureDate,
+          createdAt: data.createdAt?.toDate?.() || new Date(),
+          driver: {
+            ...data.driver,
+            phone: data.driver?.phone || '',
+            profilePicture: data.driver?.profilePicture || '',
+          },
+        };
+      })
+      .filter((trip): trip is Trip => trip !== null && trip.availableSeats > 0)
+      .slice(0, 4); // solo 4 recomendados
+
+    setRecommendedTrips(trips);
+  } catch (error) {
+    console.error('Error al traer viajes recomendados:', error);
+  }
+};
+
 
     fetchRecommendedTrips();
   }, []);
