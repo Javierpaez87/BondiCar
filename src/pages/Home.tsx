@@ -155,6 +155,29 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+ {/* 🚗 Viajes recomendados */}
+      {recommendedTrips.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-10 text-slate-800">
+              Viajes que pueden interesarte
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
+              {recommendedTrips.map((trip) => (
+                <TripCard key={trip.id} trip={trip} />
+              ))}
+            </div>
+            <div className="text-center">
+              <Button
+                onClick={() => navigate('/search')}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold border border-emerald-500 px-6 py-3 rounded-xl shadow-lg"
+              >
+                Ver más viajes
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
       {/* Features Section - Fondo claro */}
       <section className="py-16 bg-gradient-to-b from-slate-50 to-slate-100">
         <div className="container mx-auto px-4">
@@ -287,30 +310,7 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-      {/* 🚗 Viajes recomendados */}
-      {recommendedTrips.length > 0 && (
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-10 text-slate-800">
-              Viajes que pueden interesarte
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
-              {recommendedTrips.map((trip) => (
-                <TripCard key={trip.id} trip={trip} />
-              ))}
-            </div>
-            <div className="text-center">
-              <Button
-                onClick={() => navigate('/search')}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold border border-emerald-500 px-6 py-3 rounded-xl shadow-lg"
-              >
-                Ver más viajes
-              </Button>
-            </div>
-          </div>
-        </section>
-      )}
-
+      
       {/* 🧍‍♂️ Testimonios */}
       <section className="py-16 bg-gradient-to-b from-slate-50 to-white">
         <div className="container mx-auto px-4">
