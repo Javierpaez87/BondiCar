@@ -31,21 +31,31 @@ const ProfileEdit: React.FC = () => {
   const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const isMobile = window.innerWidth < 768;
+  const isMobile = window.innerWidth < 768;
 
-    if (from === 'booking') {
-      if (isMobile && formRef.current) {
-        setTimeout(() => {
-          const top = formRef.current!.getBoundingClientRect().top + window.scrollY - 60;
-          window.scrollTo({ top, behavior: 'smooth' });
-        }, 400);
-      }
+  if (from === 'booking' && formRef.current) {
+    // Esperamos al menos 600ms para asegurarnos de que todo esté montado y estable
+    const scrollTimeout = setTimeout(() => {
+      const top = formRef.current!.getBoundingClientRect().top + window.scrollY - 40;
 
+      // 1º intento
+      window.scrollTo({ top, behavior: 'smooth' });
+
+      // 2º intento (refuerzo)
       setTimeout(() => {
-        alert("Necesitás cargar tu teléfono antes de reservar un viaje. Esto solo se te solicita una vez");
+        window.scrollTo({ top, behavior: 'smooth' });
       }, 500);
-    }
-  }, [from]);
+    }, 600);
+
+    // Mensaje explicativo
+    setTimeout(() => {
+      alert("Necesitás cargar tu teléfono antes de reservar un viaje. Esto solo se te solicita una vez");
+    }, 1000);
+
+    return () => clearTimeout(scrollTimeout);
+  }
+}, [from]);
+
 
   const reauthenticateUser = async () => {
     const auth = getAuth();
