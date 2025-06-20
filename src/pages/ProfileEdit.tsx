@@ -33,17 +33,17 @@ const ProfileEdit: React.FC = () => {
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
 
-   if (isMobile && formRef.current) {
-  setTimeout(() => {
-    const top = formRef.current.getBoundingClientRect().top + window.scrollY - 60; // ajustamos un poco arriba
-    window.scrollTo({ top, behavior: 'smooth' });
-  }, 400); // mayor delay para asegurar carga completa
-}
+    if (from === 'booking') {
+      if (isMobile && formRef.current) {
+        setTimeout(() => {
+          const top = formRef.current!.getBoundingClientRect().top + window.scrollY - 60;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }, 400);
+      }
 
-      // Mostrar toast explicativo
       setTimeout(() => {
         alert("Necesitás cargar tu teléfono antes de reservar un viaje. Esto solo se te solicita una vez");
-      }, 200);
+      }, 500);
     }
   }, [from]);
 
@@ -89,7 +89,6 @@ const ProfileEdit: React.FC = () => {
 
       await updateDoc(ref, { name, phone, email });
 
-      // 🔄 Actualiza el estado del store
       useAuthStore.setState((state) => ({
         user: { ...state.user!, name, phone, email },
       }));
