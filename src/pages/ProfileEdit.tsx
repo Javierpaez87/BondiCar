@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   getFirestore,
@@ -28,6 +28,30 @@ const ProfileEdit: React.FC = () => {
   const [phone, setPhone] = useState(user?.phone || '');
   const [email, setEmail] = useState(user?.email || '');
   const [loading, setLoading] = useState(false);
+
+  const formRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (from === 'booking' && formRef.current) {
+      let attempts = 0;
+
+      const scrollToForm = () => {
+        const top = formRef.current!.getBoundingClientRect().top + window.scrollY - 60;
+        window.scrollTo({ top, behavior: 'smooth' });
+
+        // Reintenta scroll hasta 5 veces para garantizar que el navegador lo respete
+        if (attempts < 5) {
+          attempts++;
+          requestAnimationFrame(scrollToForm);
+        }
+      };
+
+      setTimeout(() => {
+        scrollToForm();
+        alert("Necesitás cargar tu teléfono antes de reservar un viaje. Esto solo se te solicita una vez");
+      }, 600);
+    }
+  }, [from]);
 
   const reauthenticateUser = async () => {
     const auth = getAuth();
@@ -71,7 +95,6 @@ const ProfileEdit: React.FC = () => {
 
       await updateDoc(ref, { name, phone, email });
 
-      // Actualiza el estado del store
       useAuthStore.setState((state) => ({
         user: { ...state.user!, name, phone, email },
       }));
@@ -129,7 +152,7 @@ const ProfileEdit: React.FC = () => {
 
   return (
     <Layout>
-      <div id="form" className="max-w-lg mx-auto mt-10 bg-white p-6 rounded shadow">
+      <div ref={formRef} className="max-w-lg mx-auto mt-10 bg-white p-6 rounded shadow">
         <h2 className="text-2xl font-bold mb-6">Editar Perfil</h2>
 
         <label className="block mb-2 font-medium">Nombre</label>
