@@ -56,7 +56,8 @@ const Search: React.FC = () => {
         'Necesitás cargar un número de teléfono para poder reservar. ¿Querés ir a tu perfil ahora?'
       );
       if (confirmRedirect) {
-        navigate('/profile/edit?from=booking#form');
+        // ✅ CAMBIO AQUÍ:
+        navigate('/profile/edit?from=booking');
       }
       return;
     }
