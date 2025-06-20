@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   getFirestore,
@@ -22,11 +22,30 @@ const ProfileEdit: React.FC = () => {
   const { user, logout } = useAuthStore();
   const [searchParams] = useSearchParams();
   const from = searchParams.get('from');
+  const navigate = useNavigate();
+
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [email, setEmail] = useState(user?.email || '');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const formRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+
+    if (from === 'booking') {
+      if (isMobile && formRef.current) {
+        setTimeout(() => {
+          formRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+
+      // Mostrar toast explicativo
+      setTimeout(() => {
+        alert("Necesitás cargar tu teléfono antes de reservar un viaje. Esto solo se te solicita una vez");
+      }, 200);
+    }
+  }, [from]);
 
   const reauthenticateUser = async () => {
     const auth = getAuth();
@@ -76,7 +95,7 @@ const ProfileEdit: React.FC = () => {
       }));
 
       alert('Perfil actualizado correctamente.');
-      navigate(from === 'search' ? '/search' : '/dashboard?tab=profile');
+      navigate(from === 'search' || from === 'booking' ? '/search' : '/dashboard?tab=profile');
     } catch (error: any) {
       if (error.code === 'auth/requires-recent-login') {
         try {
@@ -128,7 +147,7 @@ const ProfileEdit: React.FC = () => {
 
   return (
     <Layout>
-      <div className="max-w-lg mx-auto mt-10 bg-white p-6 rounded shadow">
+      <div className="max-w-lg mx-auto mt-10 bg-white p-6 rounded shadow" ref={formRef}>
         <h2 className="text-2xl font-bold mb-6">Editar Perfil</h2>
 
         <label className="block mb-2 font-medium">Nombre</label>
