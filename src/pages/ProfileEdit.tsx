@@ -33,12 +33,12 @@ const ProfileEdit: React.FC = () => {
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
 
-    if (from === 'booking') {
-      if (isMobile && formRef.current) {
-        setTimeout(() => {
-          formRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
-      }
+   if (isMobile && formRef.current) {
+  setTimeout(() => {
+    const top = formRef.current.getBoundingClientRect().top + window.scrollY - 60; // ajustamos un poco arriba
+    window.scrollTo({ top, behavior: 'smooth' });
+  }, 400); // mayor delay para asegurar carga completa
+}
 
       // Mostrar toast explicativo
       setTimeout(() => {
